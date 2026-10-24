@@ -190,7 +190,7 @@ The magic switch is `project="username/project"`. Training runs on **your** hard
     yolo train model=yolo26n.pt data=ul://your_username/datasets/your_dataset epochs=50 project=your_username/gdg-samsun
     ```
 
-Ten epochs of `yolo26n.pt` on `coco8.yaml` take about **18 seconds** on a laptop GPU and reach **mAP50 0.941**.
+Ten epochs of `yolo26n.pt` on `coco8.yaml` reach **mAP50 0.941**.
 
 <div class="gallery" markdown>
 <figure markdown>
@@ -387,21 +387,6 @@ model.export(format="engine", half=True)  # NVIDIA TensorRT FP16
 YOLO("yolo26n_openvino_model").predict("bus.jpg", device="intel:npu")  # yes, the NPU
 ```
 
-### Results on the workshop laptop
-
-| Format | Device | Inference (ms) | End to end (ms) | FPS |
-|---|---|---:|---:|---:|
-| PyTorch | cpu | 14.39 | 15.50 | 65 |
-| PyTorch | xpu | 3.53 | 5.74 | 174 |
-| ONNX | cpu | 28.38 | 67.14 | 15 |
-| OpenVINO | intel:cpu | 14.31 | 15.71 | 64 |
-| OpenVINO | intel:gpu | 1.87 | 2.97 | 337 |
-| OpenVINO | intel:npu | 3.09 | 4.54 | 220 |
-
-!!! success "Takeaway"
-
-    OpenVINO on the integrated Arc GPU delivers **5x the FPS** of PyTorch on the CPU (337 vs 65). The NPU even beats PyTorch on the laptop GPU (220 vs 174 FPS) while sipping power, which makes it perfect for always on cameras. Same model and weights, only the runtime changes.
-
 !!! info "Got an NVIDIA GPU?"
 
     The race adds a TensorRT FP16 row on its own when it finds CUDA. On Colab pick the T4 runtime and the notebook does it for you. Rust can run TensorRT FP16 straight from the ONNX file too, see Step 3.4.
@@ -561,37 +546,9 @@ let mut model = YOLOModel::load_with_config("yolo26n.onnx", config)?;
 
     An NVIDIA driver plus the CUDA 13 runtime, cuDNN 9 and TensorRT 10 on the library path. The prebuilt ONNX Runtime is built for CUDA 13 only. Pass `--rect false` to the CLI so every frame has the same shape and only one engine gets built. Want plain CUDA without TensorRT? Use `--device cuda:0`.
 
-### Results: Python vs Rust
-
-Same laptop, same `yolo26n` exports, best of three medians over 300 runs.
-
-<div class="wide" markdown>
-![Python and Rust frames per second on each engine and device](assets/img/fps_en_light.png#only-light)
-![Python and Rust frames per second on each engine and device](assets/img/fps_en_dark.png#only-dark)
-</div>
-
-| Engine | Device | Inference (ms) | End to end (ms) | FPS |
-|---|---|---:|---:|---:|
-| ONNX Runtime | cpu | 15.65 | 16.33 | 61 |
-| OpenVINO | intel:cpu | 24.63 | 25.30 | 40 |
-| OpenVINO with THREADS=16 | intel:cpu | 15.04 | 15.80 | 63 |
-| OpenVINO | intel:gpu | 1.91 | 2.40 | 417 |
-| OpenVINO | intel:npu | 2.19 | 2.73 | 366 |
-
-Video throughput and memory on a 620 frame crowd clip:
-
-| Runtime | Engine and device | Frames | FPS | Peak memory |
-|---|---|---:|---:|---:|
-| Python Ultralytics YOLO `predict(stream=True)` | OpenVINO on intel:gpu | 620 | 283 | 942 MB |
-| Rust `gdg-inference video` (Ultralytics Inference crate) | OpenVINO on intel:gpu | 620 | 400 | 284 MB |
-
-!!! success "Takeaway"
-
-    The Rust binary is **37 MB** and needs no Python environment (the workshop Python `.venv` is 7.9 GB). End to end it beats Python on the GPU, the NPU and ONNX Runtime, matches it on the CPU once threads are set, runs video **1.4x faster** and uses **3.3x less memory**. ONNX Runtime on the CPU goes from 67.14 ms in Python to 16.33 ms in Rust.
-
 !!! tip "Hybrid laptops and CPU threads"
 
-    On Intel hybrid CPUs, OpenVINO in Rust picks its own thread count by default. Pass `THREADS=16` (all cores) to the workshop app or call `.with_threads(16)` and the CPU path gets about 1.6x faster.
+    On Intel hybrid CPUs, OpenVINO in Rust picks its own thread count by default. Pass `THREADS=16` (all cores) to the workshop app or call `.with_threads(16)` and the CPU path gets faster.
 
 ## Mini challenges :trophy:
 
@@ -622,25 +579,6 @@ Video throughput and memory on a 620 frame crowd clip:
 ??? question "Training does not show up on the Ultralytics Platform"
 
     You need Python 3.11 or newer, `ultralytics` 8.4.120 or newer, a valid key from `yolo login`, and a `project` in the `username/project` form.
-
-## Repository map :file_folder:
-
-| Path | What it is |
-|---|---|
-| `setup_env.sh` | Builds `.venv` with PyTorch for CUDA, Intel XPU or CPU plus OpenVINO |
-| `local_python/00_check_env.py` | Shows your PyTorch device, OpenVINO devices, Rust CLI and Platform key |
-| `local_python/01_hybrid_train.py` | Trains locally with live Ultralytics Platform metrics |
-| `local_python/02_export_model.py` | Exports to ONNX and OpenVINO, then races every format on every device |
-| `local_python/03_all_tasks.py` | detect, segment, semantic, depth, classify, pose and obb |
-| `local_python/04_track.py` | Tracks every person in a video |
-| `local_python/05_webcam.py` | Live webcam with an FPS counter |
-| `local_python/06_solutions.py` | Counting, heatmap, privacy blur and speed estimation |
-| `local_python/07_auto_annotate.py` | Auto annotation with Ultralytics YOLO and SAM |
-| `local_python/08_platform_tour.py` | Cloud GPU availability, plus your account and projects |
-| `local_python/device_utils.py` | Picks NVIDIA CUDA, Intel XPU, Apple MPS or CPU |
-| `local_inference/` | Rust Cargo project plus `run_cli.sh` for `ultralytics-inference` |
-| `notebooks/hybrid_yolo_workshop.ipynb` | The whole workshop in Google Colab |
-| `tools/` | Notebook generator, page charts and GIFs, and the prose style checker |
 
 ## Stay in touch :handshake:
 

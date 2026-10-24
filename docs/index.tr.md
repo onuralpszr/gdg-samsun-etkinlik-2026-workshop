@@ -190,7 +190,7 @@ export ULTRALYTICS_API_KEY=ul_your_api_key
     yolo train model=yolo26n.pt data=ul://your_username/datasets/your_dataset epochs=50 project=your_username/gdg-samsun
     ```
 
-`yolo26n.pt` modelinin `coco8.yaml` üzerinde on epoch eğitimi, bir dizüstü bilgisayar GPU'sunda yaklaşık **18 saniye** sürdü ve **0.941 mAP50** değerine ulaştı.
+`yolo26n.pt` modelinin `coco8.yaml` üzerinde on epoch eğitimi **0.941 mAP50** değerine ulaştı.
 
 <div class="gallery" markdown>
 <figure markdown>
@@ -389,21 +389,6 @@ model.export(format="engine", half=True)  # NVIDIA TensorRT FP16
 YOLO("yolo26n_openvino_model").predict("bus.jpg", device="intel:npu")  # evet, NPU üzerinde de çalışır
 ```
 
-### Atölye bilgisayarındaki sonuçlar
-
-| Format | Cihaz | Çıkarım (ms) | Uçtan uca (ms) | FPS |
-|---|---|---:|---:|---:|
-| PyTorch | cpu | 14.39 | 15.50 | 65 |
-| PyTorch | xpu | 3.53 | 5.74 | 174 |
-| ONNX | cpu | 28.38 | 67.14 | 15 |
-| OpenVINO | intel:cpu | 14.31 | 15.71 | 64 |
-| OpenVINO | intel:gpu | 1.87 | 2.97 | 337 |
-| OpenVINO | intel:npu | 3.09 | 4.54 | 220 |
-
-!!! success "Öne çıkanlar"
-
-    Dahili Arc GPU üzerinde çalışan OpenVINO, CPU üzerindeki PyTorch'un **5 katı FPS** veriyor (65 yerine 337). NPU ise çok az enerji harcarken dizüstü GPU'sundaki PyTorch'u bile geçiyor (174 yerine 220 FPS). Bu yüzden sürekli açık kalan kameralar için ideal bir seçenek. Model ve ağırlıklar aynı, değişen tek şey çalışma ortamı.
-
 !!! info "NVIDIA GPU'nuz varsa"
 
     Yarış CUDA bulduğunda tabloya kendiliğinden bir TensorRT FP16 satırı ekler. Colab'da T4 çalışma ortamını seçerseniz notebook bu adımı sizin için yapar. Rust da ONNX dosyasından doğrudan TensorRT FP16 çalıştırabilir, ayrıntılar Adım 3.4'te.
@@ -563,37 +548,9 @@ let mut model = YOLOModel::load_with_config("yolo26n.onnx", config)?;
 
     Bir NVIDIA sürücüsünün yanında CUDA 13 runtime, cuDNN 9 ve TensorRT 10 kütüphanelerinin de kütüphane yolunda bulunması gerekir. Hazır ONNX Runtime yalnızca CUDA 13 için derlenmiştir. CLI'a `--rect false` verirseniz her kare aynı boyutta olur ve yalnızca tek bir motor derlenir. TensorRT olmadan sadece CUDA kullanmak isterseniz `--device cuda:0` yazmanız yeterlidir.
 
-### Sonuçlar: Python ve Rust karşılaştırması
-
-Aynı bilgisayar ve aynı `yolo26n` modelleri kullanıldı. Her ölçüm 300 kez çalıştırıldı ve üç denemenin en iyi medyan değeri alındı.
-
-<div class="wide" markdown>
-![Her motor ve cihazda Python ile Rust saniyedeki kare sayısı](assets/img/fps_tr_light.png#only-light)
-![Her motor ve cihazda Python ile Rust saniyedeki kare sayısı](assets/img/fps_tr_dark.png#only-dark)
-</div>
-
-| Motor | Cihaz | Çıkarım (ms) | Uçtan uca (ms) | FPS |
-|---|---|---:|---:|---:|
-| ONNX Runtime | cpu | 15.65 | 16.33 | 61 |
-| OpenVINO | intel:cpu | 24.63 | 25.30 | 40 |
-| OpenVINO, THREADS=16 | intel:cpu | 15.04 | 15.80 | 63 |
-| OpenVINO | intel:gpu | 1.91 | 2.40 | 417 |
-| OpenVINO | intel:npu | 2.19 | 2.73 | 366 |
-
-620 karelik bir kalabalık videosunda işleme hızı ve bellek kullanımı:
-
-| Çalışma ortamı | Motor ve cihaz | Kare | FPS | En yüksek bellek |
-|---|---|---:|---:|---:|
-| Python Ultralytics YOLO `predict(stream=True)` | intel:gpu üzerinde OpenVINO | 620 | 283 | 942 MB |
-| Rust `gdg-inference video` (Ultralytics Inference kütüphanesi) | intel:gpu üzerinde OpenVINO | 620 | 400 | 284 MB |
-
-!!! success "Öne çıkanlar"
-
-    Rust uygulaması yalnızca **37 MB** boyutunda ve Python ortamına ihtiyaç duymuyor. Karşılaştırma için, atölyenin Python `.venv` klasörü 7.9 GB yer kaplıyor. Uçtan uca ölçümlerde Rust, Python'u GPU, NPU ve ONNX Runtime üzerinde geride bırakıyor. CPU'da ise thread sayısı ayarlandığında Python ile aynı seviyeye geliyor. Videoyu **1.4 kat daha hızlı** işliyor ve **3.3 kat daha az bellek** kullanıyor. CPU üzerindeki ONNX Runtime süresi Python'da 67.14 ms iken Rust'ta 16.33 ms'ye düşüyor.
-
 !!! tip "Hibrit işlemcilerde CPU thread sayısı"
 
-    Intel hibrit işlemcilerde Rust tarafındaki OpenVINO, kullanacağı thread sayısını varsayılan olarak kendisi belirler. Atölye uygulamasına `THREADS=16` (tüm çekirdekler) verirseniz ya da kodda `.with_threads(16)` kullanırsanız CPU üzerindeki çıkarım yaklaşık 1.6 kat hızlanır.
+    Intel hibrit işlemcilerde Rust tarafındaki OpenVINO, kullanacağı thread sayısını varsayılan olarak kendisi belirler. Atölye uygulamasına `THREADS=16` (tüm çekirdekler) verirseniz ya da kodda `.with_threads(16)` kullanırsanız CPU üzerindeki çıkarım hızlanır.
 
 ## Mini görevler :trophy:
 
@@ -624,25 +581,6 @@ Aynı bilgisayar ve aynı `yolo26n` modelleri kullanıldı. Her ölçüm 300 kez
 ??? question "Eğitim Ultralytics Platform'da görünmüyor"
 
     Python 3.11 ya da üzeri, `ultralytics` 8.4.120 ya da üzeri, `yolo login` ile kaydedilmiş geçerli bir anahtar ve `username/project` biçiminde bir `project` değeri gerekir.
-
-## Depo haritası :file_folder:
-
-| Yol | Açıklama |
-|---|---|
-| `setup_env.sh` | CUDA, Intel XPU ya da CPU için PyTorch ile OpenVINO içeren `.venv` ortamını kurar |
-| `local_python/00_check_env.py` | PyTorch cihazınızı, OpenVINO cihazlarını, Rust CLI aracını ve Platform anahtarınızı gösterir |
-| `local_python/01_hybrid_train.py` | Canlı Ultralytics Platform metrikleriyle yerel eğitim yapar |
-| `local_python/02_export_model.py` | ONNX ve OpenVINO'ya aktarır, sonra her formatı her cihazda yarıştırır |
-| `local_python/03_all_tasks.py` | detect, segment, semantic, depth, classify, pose ve obb görevlerini çalıştırır |
-| `local_python/04_track.py` | Videodaki her kişiyi takip eder |
-| `local_python/05_webcam.py` | FPS sayacıyla canlı webcam görüntüsü gösterir |
-| `local_python/06_solutions.py` | Sayma, ısı haritası, gizlilik bulanıklaştırma ve hız tahmini yapar |
-| `local_python/07_auto_annotate.py` | Ultralytics YOLO ve SAM ile otomatik etiketleme yapar |
-| `local_python/08_platform_tour.py` | Bulut GPU durumunu, hesabınızı ve projelerinizi gösterir |
-| `local_python/device_utils.py` | NVIDIA CUDA, Intel XPU, Apple MPS ya da CPU arasından seçim yapar |
-| `local_inference/` | `ultralytics-inference` için Rust Cargo projesi ve `run_cli.sh` betiği |
-| `notebooks/hybrid_yolo_workshop.ipynb` | Atölyenin tamamını Google Colab üzerinde sunar |
-| `tools/` | Notebook üretici, sayfa grafikleri ve GIF dosyaları ile yazım stili kontrol aracı |
 
 ## İletişimde kalalım :handshake:
 

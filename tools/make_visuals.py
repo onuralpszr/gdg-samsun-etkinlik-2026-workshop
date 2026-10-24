@@ -6,14 +6,10 @@ Run it from the repo root after the workshop scripts have produced their outputs
 """
 
 import subprocess
-from itertools import product
 from pathlib import Path
 
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import font_manager
-from matplotlib.patches import FancyBboxPatch, Rectangle
 from PIL import Image, ImageDraw, ImageFont
 from ultralytics import YOLO
 from ultralytics.utils.checks import check_font
@@ -21,70 +17,6 @@ from ultralytics.utils.plotting import colors
 
 IMG = Path("docs/assets/img")
 GDG = ["#4285f4", "#ea4335", "#fbbc04", "#34a853"]
-
-# Frames per second on the workshop laptop, end to end, from the docs tables (None means not measured)
-FPS_ROWS = [
-    ("PyTorch  cpu", 65, None),
-    ("PyTorch  xpu", 174, None),
-    ("ONNX Runtime  cpu", 15, 61),
-    ("OpenVINO  intel:cpu", 64, 40),
-    ("OpenVINO  intel:npu", 220, 366),
-    ("OpenVINO  intel:gpu", 337, 417),
-]
-TEXT = {
-    "en": ("yolo26n on one Intel Core Ultra laptop", "frames per second, end to end, higher is better"),
-    "tr": ("Tek bir Intel Core Ultra dizüstünde yolo26n", "saniyedeki kare sayısı, uçtan uca, yüksek olan daha iyi"),
-}
-THEMES = {
-    "light": {"surface": "#ffffff", "ink": "#202124", "muted": "#5f6368", "grid": "#e8eaed"},
-    "dark": {"surface": "#17181b", "ink": "#e8eaed", "muted": "#9aa0a6", "grid": "#2d2f33"},
-}
-
-
-def bar(ax, y, width, height, color, surface):
-    """A bar with a 4px style rounded data end and a square baseline."""
-    radius = min(height / 2, width / 2) if width else 0
-    ax.add_patch(
-        FancyBboxPatch((0, y), width, height, boxstyle=f"round,pad=0,rounding_size={radius}", color=color, lw=0)
-    )
-    ax.add_patch(Rectangle((0, y), min(radius, width), height, color=color, lw=0))  # square it off at the baseline
-
-
-def fps_chart():
-    """Grouped bars of Python and Rust FPS per engine and device, one image per theme."""
-    if "Inter" in {f.name for f in font_manager.fontManager.ttflist}:
-        plt.rcParams["font.family"] = "Inter"
-    for (theme, t), (lang, (title, xlabel)) in product(THEMES.items(), TEXT.items()):
-        fig, ax = plt.subplots(figsize=(10, 5.2), dpi=160)
-        fig.patch.set_facecolor(t["surface"])
-        ax.set_facecolor(t["surface"])
-        h = 0.34
-        for i, (label, py, rs) in enumerate(FPS_ROWS):
-            for value, offset, color in ((py, h / 2 + 0.02, GDG[0]), (rs, -h / 2 - 0.02, GDG[1])):
-                if value is None:
-                    continue
-                bar(ax, i + offset - h / 2, value, h, color, t["surface"])
-                ax.text(value + 6, i + offset, f"{value}", va="center", ha="left", fontsize=10, color=t["ink"])
-        ax.set_yticks(range(len(FPS_ROWS)), [r[0] for r in FPS_ROWS], fontsize=10.5, color=t["ink"])
-        ax.set_xlim(0, 470)
-        ax.set_ylim(-0.6, len(FPS_ROWS) - 0.4)
-        ax.xaxis.grid(True, color=t["grid"], lw=1)
-        ax.set_axisbelow(True)
-        ax.tick_params(axis="x", colors=t["muted"], labelsize=9, length=0)
-        ax.tick_params(axis="y", length=0)
-        for side in ax.spines.values():
-            side.set_visible(False)
-        ax.set_xlabel(xlabel, color=t["muted"], fontsize=9.5)
-        fig.suptitle(title, x=0.02, ha="left", color=t["ink"], fontsize=14, weight="bold")
-        handles = [plt.Rectangle((0, 0), 1, 1, color=c) for c in GDG[:2]]
-        legend = ax.legend(
-            handles, ["Python, Ultralytics YOLO", "Rust, Ultralytics Inference"], loc="lower right", frameon=False
-        )
-        for text in legend.get_texts():
-            text.set_color(t["ink"])
-        fig.tight_layout()
-        fig.savefig(IMG / f"fps_{lang}_{theme}.png", facecolor=t["surface"])
-        plt.close(fig)
 
 
 def to_gif(frames_dir, gif, fps):
@@ -197,8 +129,7 @@ def annotate_previews(folder="datasets/auto_annotate_demo"):
 
 
 if __name__ == "__main__":
-    fps_chart()
     tracking_gif()
     tasks_gif()
     annotate_previews()
-    print(f"Saved the charts and GIFs in {IMG}")
+    print(f"Saved the GIFs and previews in {IMG}")

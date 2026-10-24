@@ -126,7 +126,7 @@ model.train(data="coco8.yaml", epochs=10, device=0, project="your_username/gdg-s
 
 Want a cloud GPU instead? Open your project on the Platform, click **New Model**, pick `YOLO26n` and a dataset, choose a GPU and press **Start Training**. Datasets on the Platform train locally too with `data=ul://your_username/datasets/your_dataset`.
 
-Ten epochs on `coco8.yaml` take about **18 seconds** on a laptop GPU and reach **mAP50 0.941**.
+Ten epochs on `coco8.yaml` reach **mAP50 0.941**.
 
 <img src="docs/assets/results/training_results.png" alt="Training curves" width="100%">
 
@@ -180,15 +180,6 @@ yolo export model=yolo26n.pt format=engine half=True        # NVIDIA TensorRT FP
 # export, then race every format on every device
 python local_python/02_export_model.py
 ```
-
-| Format | Device | Inference (ms) | End to end (ms) | FPS |
-|---|---|---:|---:|---:|
-| PyTorch | cpu | 14.39 | 15.50 | 65 |
-| PyTorch | xpu | 3.53 | 5.74 | 174 |
-| ONNX | cpu | 28.38 | 67.14 | 15 |
-| OpenVINO | intel:cpu | 14.31 | 15.71 | 64 |
-| OpenVINO | intel:gpu | 1.87 | 2.97 | 337 |
-| OpenVINO | intel:npu | 3.09 | 4.54 | 220 |
 
 ## Step 3: High speed execution with Ultralytics Inference
 
@@ -244,46 +235,6 @@ The Cargo project in `local_inference/` uses the crate directly with image, batc
 cargo build --release --manifest-path local_inference/Cargo.toml --features "openvino,video"
 DEVICE=intel:gpu local_inference/target/release/gdg-inference video yolo26n_openvino_model video.mp4
 ```
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/img/fps_en_dark.png"><img src="docs/assets/img/fps_en_light.png" alt="Python and Rust frames per second on each engine and device" width="100%"></picture>
-
-| Engine | Device | Inference (ms) | End to end (ms) | FPS |
-|---|---|---:|---:|---:|
-| ONNX Runtime | cpu | 15.65 | 16.33 | 61 |
-| OpenVINO | intel:cpu | 24.63 | 25.30 | 40 |
-| OpenVINO with THREADS=16 | intel:cpu | 15.04 | 15.80 | 63 |
-| OpenVINO | intel:gpu | 1.91 | 2.40 | 417 |
-| OpenVINO | intel:npu | 2.19 | 2.73 | 366 |
-
-| Runtime | Engine and device | Frames | FPS | Peak memory |
-|---|---|---:|---:|---:|
-| Python Ultralytics YOLO `predict(stream=True)` | OpenVINO on intel:gpu | 620 | 283 | 942 MB |
-| Rust `gdg-inference video` (Ultralytics Inference crate) | OpenVINO on intel:gpu | 620 | 400 | 284 MB |
-
-The Rust binary is 37 MB with no Python at runtime. It runs video 1.4x faster with 3.3x less memory.
-
-## Repository layout
-
-| Path | What it is |
-|---|---|
-| `setup_env.sh` | Builds `.venv` with PyTorch for CUDA, Intel XPU or CPU plus OpenVINO |
-| `requirements.txt` | Workshop Python packages |
-| `local_python/00_check_env.py` | Shows your PyTorch device, OpenVINO devices, Rust CLI and Platform key |
-| `local_python/01_hybrid_train.py` | Trains locally with live Ultralytics Platform metrics |
-| `local_python/02_export_model.py` | Exports to ONNX and OpenVINO, then races every format on every device |
-| `local_python/03_all_tasks.py` | detect, segment, semantic, depth, classify, pose and obb |
-| `local_python/04_track.py` | Tracks every person in a video |
-| `local_python/05_webcam.py` | Live webcam with an FPS counter |
-| `local_python/06_solutions.py` | Counting, heatmap, privacy blur and speed estimation |
-| `local_python/07_auto_annotate.py` | Auto annotation with Ultralytics YOLO and SAM |
-| `local_python/08_platform_tour.py` | Cloud GPU availability, plus your account and projects |
-| `local_python/device_utils.py` | Picks NVIDIA CUDA, Intel XPU, Apple MPS or CPU |
-| `local_inference/Cargo.toml` and `src/main.rs` | Rust app on the `ultralytics-inference` crate |
-| `local_inference/run_cli.sh` | `ultralytics-inference` CLI tour |
-| `notebooks/hybrid_yolo_workshop.ipynb` | The whole workshop in Google Colab |
-| `docs/` | GitHub Pages site built with MkDocs Material |
-| `tools/` | Notebook generator, page charts and GIFs, and the prose style checker |
-| `.github/workflows/pages.yml` | Deploys the docs on every push to `main` |
 
 ## Build the docs locally
 

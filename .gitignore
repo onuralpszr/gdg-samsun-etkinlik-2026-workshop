@@ -1,0 +1,24 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Ultralytics outputs and weights
+runs/
+datasets/
+*.pt
+*.onnx
+*.engine
+*_openvino_model/
+*_ncnn_model/
+calibration_image_sample_data_*
+
+# Rust
+local_inference/target/
+
+# Docs build
+site/
+
+# Local secrets
+.env

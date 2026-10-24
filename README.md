@@ -85,9 +85,16 @@ flowchart TB
 ```bash
 git clone https://github.com/onuralpszr/gdg-samsun-etkinlik-2026-workshop.git
 cd gdg-samsun-etkinlik-2026-workshop
-./setup_env.sh          # Intel GPU and NPU laptops (PyTorch XPU plus OpenVINO)
-./setup_env.sh cuda     # NVIDIA machines
-./setup_env.sh cpu      # Apple silicon (MPS) and any other machine
+
+# Intel GPU and NPU laptops (PyTorch XPU plus OpenVINO)
+./setup_env.sh
+
+# NVIDIA machines
+./setup_env.sh cuda
+
+# Apple silicon (MPS) and any other machine
+./setup_env.sh cpu
+
 source .venv/bin/activate
 python local_python/00_check_env.py
 ```
@@ -104,7 +111,8 @@ You need Python 3.11 or newer, `ultralytics` 8.4.120 or newer, an [Ultralytics P
 3. Log in once:
 
 ```bash
-yolo login ul_your_api_key        # or: export ULTRALYTICS_API_KEY=ul_your_api_key
+# or: export ULTRALYTICS_API_KEY=ul_your_api_key
+yolo login ul_your_api_key
 ```
 
 Train on your own hardware while the Platform shows live metrics. `project="username/project"` is the switch that turns streaming on.
@@ -171,11 +179,14 @@ Ten epochs on `coco8.yaml` reach **mAP50 0.941**.
 ## Step 2: Export to ONNX, OpenVINO and TensorRT
 
 ```bash
-yolo export model=yolo26n.pt format=onnx simplify=True      # runs everywhere
+# runs everywhere
+yolo export model=yolo26n.pt format=onnx simplify=True
 
 # Intel CPU, GPU and NPU
 yolo export model=yolo26n.pt format=openvino
-yolo export model=yolo26n.pt format=engine half=True        # NVIDIA TensorRT FP16
+
+# NVIDIA TensorRT FP16
+yolo export model=yolo26n.pt format=engine half=True
 
 # export, then race every format on every device
 python local_python/02_export_model.py

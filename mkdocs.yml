@@ -9,7 +9,7 @@ copyright: GDG Samsun DevFest 2026 workshop by Onuralp Sezer, code under AGPL 3.
 
 theme:
   name: material
-  logo: assets/logos/ultralytics-mark.png
+  logo: assets/logos/gdg-mark.svg
   favicon: assets/logos/favicon.png
   font:
     text: Roboto

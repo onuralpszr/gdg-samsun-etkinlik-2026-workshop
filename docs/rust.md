@@ -20,21 +20,29 @@ Ultralytics Inference is a Rust library and CLI for Ultralytics YOLO. It reads O
 ## 3.1 The CLI
 
 ```bash
-cargo install ultralytics-inference --features "openvino-native,video"
+# any machine, CPU only
+cargo install ultralytics-inference
 
-# OpenVINO native needs to find the runtime, the pip package works fine
+# NVIDIA GPU with CUDA and TensorRT
+cargo install ultralytics-inference --features "nvidia,video"
+
+# Intel CPU, GPU and NPU with OpenVINO, which needs to find the runtime from the pip package
+cargo install ultralytics-inference --features "openvino-native,video"
 export LD_LIBRARY_PATH=$(python -c "import openvino, os; print(os.path.dirname(openvino.__file__))")/libs
 
-# single image
+# single image on the CPU
 ultralytics-inference predict --model yolo26n.onnx --source bus.jpg
 
 # a folder
 ultralytics-inference predict --model yolo26n.onnx --source images/ --batch 4
 
-# a video on the Intel GPU
+# a video on an NVIDIA GPU
+ultralytics-inference predict --model yolo26n.onnx --device cuda:0 --source video.mp4
+
+# a video on an Intel GPU
 ultralytics-inference predict --model yolo26n_openvino_model --device intel:gpu --source video.mp4
 
-# the webcam on the NPU
+# the webcam on an Intel NPU
 ultralytics-inference predict --model yolo26n_openvino_model --device intel:npu --source 0 --show
 
 # any task, model auto downloads
@@ -77,6 +85,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 ```
 
 ```bash
+# pick the features for your machine: none for CPU, "nvidia,video" or "openvino,video"
 cargo build --release --manifest-path local_inference/Cargo.toml --features "openvino,video"
 BIN=local_inference/target/release/gdg-inference
 
@@ -89,7 +98,7 @@ $BIN batch yolo26n.onnx datasets/coco8/images/val 4
 # video, webcam or RTSP
 DEVICE=intel:gpu $BIN video yolo26n_openvino_model video.mp4
 
-# latency
+# latency, DEVICE can be cpu, cuda:0, tensorrt:0, intel:cpu, intel:gpu or intel:npu
 DEVICE=intel:npu $BIN bench yolo26n_openvino_model bus.jpg 300
 ```
 

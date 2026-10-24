@@ -241,3 +241,10 @@
   margin: 2.5rem 0 0 auto;
   border-radius: 999px;
 }
+
+/* Center the step tabs under the header */
+.md-tabs__list {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}

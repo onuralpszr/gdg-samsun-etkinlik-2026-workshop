@@ -154,7 +154,7 @@ Ten epochs on `coco8.yaml` reach **mAP50 0.941**.
 |---|---|
 | `03_all_tasks.py` runs all seven tasks | `yolo predict model=yolo26n-pose.pt source=https://ultralytics.com/images/zidane.jpg` |
 | `04_track.py` tracks every person in a video | `yolo track model=yolo26n.pt source=video.mp4 tracker=bytetrack.yaml` |
-| `05_webcam.py` shows live FPS on your webcam | `yolo predict model=yolo26n_openvino_model source=0 device=intel:gpu show=True` |
+| `05_webcam.py` shows live FPS on your webcam | `yolo predict model=yolo26n.pt source=0 device=0 show=True` |
 | `06_solutions.py count` counts, maps heat, blurs or measures speed | `yolo solutions heatmap source=video.mp4 show=True` |
 | `07_auto_annotate.py` labels images with Ultralytics YOLO plus SAM | Smart Annotation on the Ultralytics Platform with SAM, YOLO and vision language models |
 | `08_platform_tour.py` lists free cloud GPUs and your projects | `yolo login YOUR_API_KEY` first to see your account |
@@ -206,14 +206,24 @@ python local_python/02_export_model.py
 [![Ultralytics Discord](https://img.shields.io/discord/1089800235347353640?logo=discord&logoColor=white&label=Discord&color=blue)](https://discord.com/invite/ultralytics)
 
 ```bash
+# any machine, CPU only
+cargo install ultralytics-inference
+
+# NVIDIA GPU with CUDA and TensorRT
+cargo install ultralytics-inference --features "nvidia,video"
+
+# Intel CPU, GPU and NPU with OpenVINO, which needs to find the runtime from the pip package
 cargo install ultralytics-inference --features "openvino-native,video"
 export LD_LIBRARY_PATH=$(python -c "import openvino, os; print(os.path.dirname(openvino.__file__))")/libs
 
-# single image
+# single image on the CPU
 ultralytics-inference predict --model yolo26n.onnx --source bus.jpg
 
 # batch
 ultralytics-inference predict --model yolo26n.onnx --source images/ --batch 4
+
+# a video on an NVIDIA GPU, an Intel GPU, and the webcam on an Intel NPU
+ultralytics-inference predict --model yolo26n.onnx --device cuda:0 --source video.mp4
 ultralytics-inference predict --model yolo26n_openvino_model --device intel:gpu --source video.mp4
 ultralytics-inference predict --model yolo26n_openvino_model --device intel:npu --source 0 --show
 
@@ -243,7 +253,10 @@ All seven tasks work in Rust too. `./local_inference/run_cli.sh tasks` runs each
 The Cargo project in `local_inference/` uses the crate directly with image, batch, video and bench modes:
 
 ```bash
+# pick the features for your machine: none for CPU, "nvidia,video" or "openvino,video"
 cargo build --release --manifest-path local_inference/Cargo.toml --features "openvino,video"
+
+# DEVICE can be cpu, cuda:0, tensorrt:0, intel:cpu, intel:gpu or intel:npu
 DEVICE=intel:gpu local_inference/target/release/gdg-inference video yolo26n_openvino_model video.mp4
 ```
 

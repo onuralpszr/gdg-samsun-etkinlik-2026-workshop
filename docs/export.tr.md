@@ -26,7 +26,12 @@ model.export(format="onnx", simplify=True)  # her yerde çalışır
 model.export(format="openvino")  # Intel CPU, GPU ve NPU için
 model.export(format="engine", half=True)  # NVIDIA TensorRT FP16
 
-YOLO("yolo26n_openvino_model").predict("bus.jpg", device="intel:npu")  # evet, NPU üzerinde de çalışır
+YOLO("yolo26n.pt").predict("bus.jpg", device="cpu")  # her CPU üzerinde PyTorch
+YOLO("yolo26n.pt").predict("bus.jpg", device="mps")  # Apple silicon üzerinde PyTorch
+YOLO("yolo26n.onnx").predict("bus.jpg", device=0)  # NVIDIA GPU üzerinde ONNX Runtime
+YOLO("yolo26n.engine").predict("bus.jpg", device=0)  # NVIDIA GPU üzerinde TensorRT
+YOLO("yolo26n_openvino_model").predict("bus.jpg", device="intel:gpu")  # Intel GPU üzerinde OpenVINO
+YOLO("yolo26n_openvino_model").predict("bus.jpg", device="intel:npu")  # Intel NPU üzerinde OpenVINO
 ```
 
 !!! info "NVIDIA GPU'nuz varsa"

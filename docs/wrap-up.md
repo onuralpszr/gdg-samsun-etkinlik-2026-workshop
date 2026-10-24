@@ -6,7 +6,7 @@ title: "Wrap up"
 
 ## Mini challenges :trophy:
 
-- [ ] Make the NPU count people walking past the camera with `yolo solutions count model=yolo26n_openvino_model device=intel:npu source=0 show=True`
+- [ ] Count people walking past the camera with `yolo solutions count source=0 show=True`, then add `device=0` on NVIDIA or `model=yolo26n_openvino_model device=intel:npu` on an Intel NPU
 - [ ] Find the fastest device on your own laptop with `02_export_model.py` and share the table
 - [ ] Auto annotate ten photos from your phone and upload them as a dataset on the Ultralytics Platform
 - [ ] Track your friends with `yolo track model=yolo26n-pose.pt source=0 show=True`

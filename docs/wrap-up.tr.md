@@ -6,7 +6,7 @@ title: "Kapanış"
 
 ## Mini görevler :trophy:
 
-- [ ] `yolo solutions count model=yolo26n_openvino_model device=intel:npu source=0 show=True` komutuyla kameranın önünden geçen kişileri NPU üzerinde sayın.
+- [ ] `yolo solutions count source=0 show=True` komutuyla kameranın önünden geçen kişileri sayın, ardından NVIDIA üzerinde `device=0` ya da Intel NPU üzerinde `model=yolo26n_openvino_model device=intel:npu` ekleyin.
 - [ ] `02_export_model.py` ile kendi bilgisayarınızdaki en hızlı cihazı bulun ve sonuç tablosunu paylaşın.
 - [ ] Telefonunuzdan on fotoğraf seçip otomatik etiketleyin ve Ultralytics Platform'a veri seti olarak yükleyin.
 - [ ] `yolo track model=yolo26n-pose.pt source=0 show=True` komutuyla webcam üzerinden arkadaşlarınızı takip edin.

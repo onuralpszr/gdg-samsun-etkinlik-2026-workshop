@@ -72,6 +72,9 @@ python local_python/04_track.py
 # başka bir takip algoritması
 yolo track model=yolo26n.pt source=video.mp4 tracker=bytetrack.yaml
 
+# cihazı seçin: cpu, NVIDIA için 0, Apple silicon için mps
+yolo track model=yolo26n.pt source=video.mp4 device=0
+
 # Intel GPU üzerinde OpenVINO
 yolo track model=yolo26n_openvino_model source=video.mp4 device=intel:gpu
 
@@ -145,7 +148,9 @@ python local_python/05_webcam.py
 # başka bir kamera
 CAMERA=1 python local_python/05_webcam.py
 
-# motoru canlı değiştirin
+# motoru canlı değiştirin: CPU, NVIDIA GPU ya da Intel GPU üzerinde OpenVINO
+yolo predict model=yolo26n.pt source=0 device=cpu show=True
+yolo predict model=yolo26n.pt source=0 device=0 show=True
 yolo predict model=yolo26n_openvino_model source=0 device=intel:gpu show=True
 
 # takip numaralarıyla poz tahmini

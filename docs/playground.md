@@ -72,7 +72,10 @@ python local_python/04_track.py
 # another tracker
 yolo track model=yolo26n.pt source=video.mp4 tracker=bytetrack.yaml
 
-# OpenVINO on the Intel GPU
+# pick the device: cpu, 0 for NVIDIA, mps for Apple silicon
+yolo track model=yolo26n.pt source=video.mp4 device=0
+
+# OpenVINO on an Intel GPU
 yolo track model=yolo26n_openvino_model source=video.mp4 device=intel:gpu
 
 # your webcam
@@ -145,7 +148,9 @@ python local_python/05_webcam.py
 # another camera
 CAMERA=1 python local_python/05_webcam.py
 
-# switch engines live
+# switch engines live: CPU, NVIDIA GPU or OpenVINO on an Intel GPU
+yolo predict model=yolo26n.pt source=0 device=cpu show=True
+yolo predict model=yolo26n.pt source=0 device=0 show=True
 yolo predict model=yolo26n_openvino_model source=0 device=intel:gpu show=True
 
 # pose with tracking IDs

@@ -20,21 +20,29 @@ Ultralytics Inference, Ultralytics YOLO için geliştirilmiş bir Rust kütüpha
 ## 3.1 CLI aracı
 
 ```bash
-cargo install ultralytics-inference --features "openvino-native,video"
+# her bilgisayar, sadece CPU
+cargo install ultralytics-inference
 
-# OpenVINO native altyapısının çalışma kütüphanesini bulması gerekir, pip paketi bunun için yeterlidir
+# CUDA ve TensorRT ile NVIDIA GPU
+cargo install ultralytics-inference --features "nvidia,video"
+
+# OpenVINO ile Intel CPU, GPU ve NPU, çalışma kütüphanesini pip paketinden bulması gerekir
+cargo install ultralytics-inference --features "openvino-native,video"
 export LD_LIBRARY_PATH=$(python -c "import openvino, os; print(os.path.dirname(openvino.__file__))")/libs
 
-# tek görsel
+# CPU üzerinde tek görsel
 ultralytics-inference predict --model yolo26n.onnx --source bus.jpg
 
 # bir klasör
 ultralytics-inference predict --model yolo26n.onnx --source images/ --batch 4
 
+# NVIDIA GPU üzerinde bir video
+ultralytics-inference predict --model yolo26n.onnx --device cuda:0 --source video.mp4
+
 # Intel GPU üzerinde bir video
 ultralytics-inference predict --model yolo26n_openvino_model --device intel:gpu --source video.mp4
 
-# NPU üzerinde webcam
+# Intel NPU üzerinde webcam
 ultralytics-inference predict --model yolo26n_openvino_model --device intel:npu --source 0 --show
 
 # istediğiniz görev, model otomatik iner
@@ -77,6 +85,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 ```
 
 ```bash
+# bilgisayarınıza uygun özellikleri seçin: CPU için hiçbiri, "nvidia,video" ya da "openvino,video"
 cargo build --release --manifest-path local_inference/Cargo.toml --features "openvino,video"
 BIN=local_inference/target/release/gdg-inference
 
@@ -89,7 +98,7 @@ $BIN batch yolo26n.onnx datasets/coco8/images/val 4
 # video, webcam ya da RTSP yayını
 DEVICE=intel:gpu $BIN video yolo26n_openvino_model video.mp4
 
-# gecikme ölçümü
+# gecikme ölçümü, DEVICE değeri cpu, cuda:0, tensorrt:0, intel:cpu, intel:gpu ya da intel:npu olabilir
 DEVICE=intel:npu $BIN bench yolo26n_openvino_model bus.jpg 300
 ```
 

@@ -127,7 +127,7 @@ Ten epochs on `coco8.yaml` take **18 seconds** on the Intel Arc B390 laptop GPU 
 | Script | What it does |
 |---|---|
 | `03_all_tasks.py` | detect, segment, semantic, depth, classify, pose and obb with one API |
-| `04_track.py` | multi object tracking with `botsort` or `bytetrack` on video or webcam |
+| `04_track.py` | multi object tracking with six trackers on video or webcam |
 | `05_webcam.py` | live webcam with an FPS counter, swap engines on the fly |
 | `06_solutions.py` | counting, heatmap, privacy blur and speed estimation |
 | `07_auto_annotate.py` | YOLO segmentation labels for free with Ultralytics YOLO plus SAM |

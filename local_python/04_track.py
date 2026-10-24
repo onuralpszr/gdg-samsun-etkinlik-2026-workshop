@@ -1,5 +1,6 @@
-"""Multi object tracking with Ultralytics YOLO and the `botsort` or `bytetrack` trackers.
+"""Multi object tracking with Ultralytics YOLO and six built in trackers.
 
+Pick `botsort`, `bytetrack`, `ocsort`, `deepocsort`, `fasttrack` or `tracktrack` with --tracker.
 Every person gets a stable ID that follows them across frames. Works with any detect, segment, pose or obb model.
 
 Usage:
@@ -23,7 +24,8 @@ def main():
     parser = argparse.ArgumentParser(description="Track objects in a video, stream or webcam")
     parser.add_argument("--model", default="yolo26n.pt", help="any Ultralytics YOLO model or export")
     parser.add_argument("--source", default=VIDEO, help="video path, URL, RTSP stream or webcam index like 0")
-    parser.add_argument("--tracker", default="botsort", choices=["botsort", "bytetrack"], help="tracking algorithm")
+    trackers = ["botsort", "bytetrack", "ocsort", "deepocsort", "fasttrack", "tracktrack"]
+    parser.add_argument("--tracker", default="botsort", choices=trackers, help="tracking algorithm")
     parser.add_argument("--device", default="cpu", help="cpu, xpu, 0, intel:gpu or intel:npu")
     parser.add_argument("--classes", type=int, nargs="*", default=[0], help="class ids to track, 0 is person")
     parser.add_argument("--show", action="store_true", help="open a live window")

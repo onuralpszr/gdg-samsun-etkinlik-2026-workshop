@@ -281,7 +281,7 @@ YOLO("yolo26n-pose.pt").predict("https://ultralytics.com/images/zidane.jpg", sav
 
 ### Tracking
 
-Every person keeps the same ID across frames. Works with `botsort` and `bytetrack`, with any detect, segment, pose or obb model and with exported formats too.
+Every person keeps the same ID across frames. Pick from six trackers (`botsort`, `bytetrack`, `ocsort`, `deepocsort`, `fasttrack` and `tracktrack`) with any detect, segment, pose or obb model and with exported formats too.
 
 ```bash
 python local_python/04_track.py --model yolo26n_openvino_model --device intel:gpu

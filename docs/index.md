@@ -389,8 +389,6 @@ YOLO("yolo26n_openvino_model").predict("bus.jpg", device="intel:npu")  # yes, th
 
 ### Results on the workshop laptop
 
-This is the output of `02_export_model.py` on an Intel Core Ultra X7 358H with Arc B390 graphics and the built in NPU: `yolo26n.pt` at 640 on `bus.jpg`, median of 100 runs. End to end adds preprocessing and postprocessing to the inference time, and FPS is 1000 divided by the end to end time.
-
 | Format | Device | Inference (ms) | End to end (ms) | FPS |
 |---|---|---:|---:|---:|
 | PyTorch | cpu | 14.39 | 15.50 | 65 |

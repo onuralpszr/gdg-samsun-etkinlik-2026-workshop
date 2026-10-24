@@ -391,8 +391,6 @@ YOLO("yolo26n_openvino_model").predict("bus.jpg", device="intel:npu")  # evet, N
 
 ### Atölye bilgisayarındaki sonuçlar
 
-Bu tablo, Arc B390 grafik birimi ve dahili NPU bulunan Intel Core Ultra X7 358H işlemcide `02_export_model.py` betiğinin çıktısıdır. `yolo26n.pt` modeli 640 boyutunda, `bus.jpg` üzerinde 100 kez çalıştırıldı ve medyan değerler alındı. Uçtan uca süre, çıkarım süresine ön işleme ve son işlemeyi de ekler. FPS ise 1000'in uçtan uca süreye bölümüdür.
-
 | Format | Cihaz | Çıkarım (ms) | Uçtan uca (ms) | FPS |
 |---|---|---:|---:|---:|
 | PyTorch | cpu | 14.39 | 15.50 | 65 |

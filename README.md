@@ -181,8 +181,6 @@ yolo export model=yolo26n.pt format=engine half=True        # NVIDIA TensorRT FP
 python local_python/02_export_model.py
 ```
 
-Output of `02_export_model.py` on an Intel Core Ultra X7 358H with Arc B390 graphics and the built in NPU, `yolo26n.pt` at 640, median of 100 runs. FPS is 1000 divided by the end to end time.
-
 | Format | Device | Inference (ms) | End to end (ms) | FPS |
 |---|---|---:|---:|---:|
 | PyTorch | cpu | 14.39 | 15.50 | 65 |

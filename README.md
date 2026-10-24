@@ -108,7 +108,8 @@ yolo login ul_your_api_key        # or: export ULTRALYTICS_API_KEY=ul_your_api_k
 Train on your own hardware while the Platform shows live metrics. `project="username/project"` is the switch that turns streaming on.
 
 ```bash
-python local_python/01_hybrid_train.py --model yolo26n.pt --data coco8.yaml --epochs 10 --project gdg-samsun   # picks CUDA, Intel XPU, Apple MPS or CPU on its own
+# device=0 for NVIDIA CUDA, device=xpu for Intel GPU, device=mps for Apple silicon, device=cpu for any machine
+yolo train model=yolo26n.pt data=coco8.yaml epochs=10 device=0 project=your_username/gdg-samsun name=laptop-run
 ```
 
 ```python
@@ -118,6 +119,8 @@ model = YOLO("yolo26n.pt")
 # device: 0 for NVIDIA CUDA, "xpu" for Intel GPU, "mps" for Apple silicon, "cpu" for any machine
 model.train(data="coco8.yaml", epochs=10, device=0, project="your_username/gdg-samsun", name="laptop-run")
 ```
+
+`local_python/01_hybrid_train.py` is the same code in a file that picks the best device on its own. Put your username in `PROJECT` at the top.
 
 Want a cloud GPU instead? Open your project on the Platform, click **New Model**, pick `YOLO26n` and a dataset, choose a GPU and press **Start Training**. Datasets on the Platform train locally too with `data=ul://your_username/datasets/your_dataset`.
 
@@ -137,14 +140,14 @@ Ten epochs on `coco8.yaml` take about **18 seconds** on a laptop GPU and reach *
 [![Open Ultralytics In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ultralytics/ultralytics/blob/main/examples/tutorial.ipynb)
 [![Open Ultralytics In Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://www.kaggle.com/models/ultralytics/yolo26)
 
-| Script | What it does |
+| Script | Same idea from the CLI |
 |---|---|
-| `03_all_tasks.py` | detect, segment, semantic, depth, classify, pose and obb with one API |
-| `04_track.py` | multi object tracking with six trackers on video or webcam |
-| `05_webcam.py` | live webcam with an FPS counter, swap engines on the fly |
-| `06_solutions.py` | counting, heatmap, privacy blur and speed estimation |
-| `07_auto_annotate.py` | YOLO segmentation labels for free with Ultralytics YOLO plus SAM, and the Platform adds Smart Annotation with SAM, YOLO and vision language models |
-| `08_platform_tour.py` | GPU availability, account, projects and remote predict on the Ultralytics Platform |
+| `03_all_tasks.py` runs all seven tasks | `yolo predict model=yolo26n-pose.pt source=https://ultralytics.com/images/zidane.jpg` |
+| `04_track.py` tracks every person in a video | `yolo track model=yolo26n.pt source=video.mp4 tracker=bytetrack.yaml` |
+| `05_webcam.py` shows live FPS on your webcam | `yolo predict model=yolo26n_openvino_model source=0 device=intel:gpu show=True` |
+| `06_solutions.py count` counts, maps heat, blurs or measures speed | `yolo solutions heatmap source=video.mp4 show=True` |
+| `07_auto_annotate.py` labels images with Ultralytics YOLO plus SAM | Smart Annotation on the Ultralytics Platform with SAM, YOLO and vision language models |
+| `08_platform_tour.py` lists free cloud GPUs and your projects | `yolo login YOUR_API_KEY` first to see your account |
 
 <table>
 <tr>
@@ -166,20 +169,22 @@ Ten epochs on `coco8.yaml` take about **18 seconds** on a laptop GPU and reach *
 ## Step 2: Export to ONNX, OpenVINO and TensorRT
 
 ```bash
-python local_python/02_export_model.py                      # ONNX with simplify=True plus OpenVINO, then race
-python local_python/02_export_model.py --tensorrt           # adds TensorRT with half=True on NVIDIA
+yolo export model=yolo26n.pt format=onnx simplify=True      # runs everywhere
+yolo export model=yolo26n.pt format=openvino                # Intel CPU, GPU and NPU
+yolo export model=yolo26n.pt format=engine half=True        # NVIDIA TensorRT FP16
+python local_python/02_export_model.py                      # export, then race every format on every device
 ```
 
-Intel Core Ultra X7 358H with Arc B390 graphics and the built in NPU, `yolo26n.pt` at 640, median of 100 runs:
+Output of `02_export_model.py` on an Intel Core Ultra X7 358H with Arc B390 graphics and the built in NPU, `yolo26n.pt` at 640, median of 100 runs. FPS is 1000 divided by the end to end time.
 
-| Format | Device | Size (MB) | Inference (ms) | End to end (ms) | FPS | Speedup | Objects |
-|---|---|---:|---:|---:|---:|---:|---:|
-| PyTorch | cpu | 5.5 | 14.6 | 15.7 | 69 | 1.0x | 5 |
-| PyTorch | xpu | 5.5 | 3.2 | 5.3 | 312 | 4.6x | 5 |
-| ONNX | cpu | 9.9 | 42.4 | 83.6 | 24 | 0.3x | 5 |
-| OpenVINO | intel:cpu | 10.1 | 15.2 | 16.7 | 66 | 1.0x | 5 |
-| OpenVINO | intel:gpu | 10.1 | 1.9 | 3.0 | 532 | 7.8x | 5 |
-| OpenVINO | intel:npu | 10.1 | 3.2 | 4.7 | 316 | 4.6x | 5 |
+| Format | Device | Inference (ms) | End to end (ms) | FPS |
+|---|---|---:|---:|---:|
+| PyTorch | cpu | 14.39 | 15.50 | 65 |
+| PyTorch | xpu | 3.53 | 5.74 | 174 |
+| ONNX | cpu | 28.38 | 67.14 | 15 |
+| OpenVINO | intel:cpu | 14.31 | 15.71 | 64 |
+| OpenVINO | intel:gpu | 1.87 | 2.97 | 337 |
+| OpenVINO | intel:npu | 3.09 | 4.54 | 220 |
 
 ## Step 3: High speed execution with Ultralytics Inference
 
@@ -251,16 +256,16 @@ The Rust binary is 37 MB with no Python at runtime. It runs video 1.4x faster wi
 |---|---|
 | `setup_env.sh` | Builds `.venv` with PyTorch for CUDA, Intel XPU or CPU plus OpenVINO |
 | `requirements.txt` | Workshop Python packages |
-| `local_python/00_check_env.py` | Prerequisites check for every accelerator |
-| `local_python/01_hybrid_train.py` | Ultralytics Platform login and hybrid training |
-| `local_python/02_export_model.py` | ONNX, OpenVINO and TensorRT export plus the speed race |
+| `local_python/00_check_env.py` | Shows your PyTorch device, OpenVINO devices, Rust CLI and Platform key |
+| `local_python/01_hybrid_train.py` | Trains locally with live Ultralytics Platform metrics |
+| `local_python/02_export_model.py` | Exports to ONNX and OpenVINO, then races every format on every device |
 | `local_python/03_all_tasks.py` | detect, segment, semantic, depth, classify, pose and obb |
-| `local_python/04_track.py` | Multi object tracking on video or webcam |
+| `local_python/04_track.py` | Tracks every person in a video |
 | `local_python/05_webcam.py` | Live webcam with an FPS counter |
 | `local_python/06_solutions.py` | Counting, heatmap, privacy blur and speed estimation |
 | `local_python/07_auto_annotate.py` | Auto annotation with Ultralytics YOLO and SAM |
-| `local_python/08_platform_tour.py` | Ultralytics Platform Python client tour |
-| `local_python/device_utils.py` | Shared device picker for NVIDIA CUDA, Intel XPU, Apple MPS and CPU |
+| `local_python/08_platform_tour.py` | Cloud GPU availability, plus your account and projects |
+| `local_python/device_utils.py` | Picks NVIDIA CUDA, Intel XPU, Apple MPS or CPU |
 | `local_inference/Cargo.toml` and `src/main.rs` | Rust app on the `ultralytics-inference` crate |
 | `local_inference/run_cli.sh` | `ultralytics-inference` CLI tour |
 | `notebooks/hybrid_yolo_workshop.ipynb` | The whole workshop in Google Colab |

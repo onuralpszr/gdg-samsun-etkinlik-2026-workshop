@@ -125,7 +125,7 @@ flowchart TB
 
     Sayfanın en üstündeki **Colab'da aç** düğmesine basın ve **Runtime > Change runtime type > T4 GPU** seçeneğini seçin. Bu yolda bilgisayarınıza hiçbir şey kurmanız gerekmez.
 
-Kontrol betiği PyTorch sürümünü ve bulabildiği tüm hızlandırıcıları listeler. NVIDIA CUDA, Intel XPU ve Apple MPS ile OpenVINO'nun CPU, GPU ve NPU cihazları bu listede yer alır. Ayrıca ONNX Runtime, Rust ve Ultralytics Platform anahtarınızı da kontrol eder, ardından bilgisayarınız için en uygun eğitim ve çıkarım cihazını önerir.
+`setup_env.sh` en sonda `local_python/00_check_env.py` betiğini çalıştırır. Bu kısa kontrol PyTorch cihazınızı, OpenVINO cihazlarını, Rust CLI aracını ve Ultralytics Platform anahtarınızı gösterir. Ayrıntılı sistem raporu için `yolo checks` komutunu çalıştırabilirsiniz.
 
 !!! tip "Başlamadan önce kontrol listesi"
 
@@ -153,13 +153,12 @@ export ULTRALYTICS_API_KEY=ul_your_api_key
 
 İşin sırrı `project="username/project"` parametresinde. Eğitim **sizin** donanımınızda çalışırken Ultralytics Platform canlı metrikleri, grafikleri, konsol çıktısını ve eğitilen son modeli alır.
 
-=== "Atölye betiği"
+=== "CLI"
 
     ```bash
-    python local_python/01_hybrid_train.py --model yolo26n.pt --data coco8.yaml --epochs 10 --project gdg-samsun
+    # NVIDIA CUDA için device=0, Intel GPU için device=xpu, Apple silicon için device=mps, her bilgisayarda device=cpu
+    yolo train model=yolo26n.pt data=coco8.yaml epochs=10 device=0 project=your_username/gdg-samsun name=laptop-run
     ```
-
-    Betik önce anahtarınızı doğrular ve kullanıcı adınızı bulur. Ardından `gdg-samsun` adını `username/gdg-samsun` biçimine çevirir. En uygun cihazı (NVIDIA CUDA, Intel XPU, Apple MPS ya da CPU) da kendisi seçer. Anahtarınız yoksa eğitimi çevrimdışı yapar ve anahtarı nereden alabileceğinizi gösterir.
 
 === "Python"
 
@@ -171,12 +170,13 @@ export ULTRALYTICS_API_KEY=ul_your_api_key
     model.train(data="coco8.yaml", epochs=10, device=0, project="your_username/gdg-samsun", name="laptop-run")
     ```
 
-=== "CLI"
+=== "Atölye betiği"
 
     ```bash
-    # NVIDIA CUDA için device=0, Intel GPU için device=xpu, Apple silicon için device=mps, her bilgisayarda device=cpu
-    yolo train model=yolo26n.pt data=coco8.yaml epochs=10 device=0 project=your_username/gdg-samsun name=laptop-run
+    python local_python/01_hybrid_train.py
     ```
+
+    Aynı Python kodu, bu kez bir dosyada. En üstteki `PROJECT` satırına kullanıcı adınızı yazmanız yeterli. Betik en uygun cihazı (NVIDIA CUDA, Intel XPU, Apple MPS ya da CPU) kendisi seçer. `yolo login` yapmadıysanız eğitimi çevrimdışı tamamlar.
 
 === "Platform veri seti"
 
@@ -208,13 +208,10 @@ export ULTRALYTICS_API_KEY=ul_your_api_key
 3. Epoch sayısını, batch boyutunu ve görsel boyutunu ayarlayıp bir GPU seçin. Hızlı bir deneme için RTX 2000 Ada yeterlidir.
 4. **Start Training** düğmesine basın ve aynı panelin dolmasını izleyin.
 
-Hangi GPU'ların şu anda boşta olduğunu Python ile kontrol edebilirsiniz. Bunun için anahtar gerekmez.
+Hangi bulut GPU'larının şu anda boşta olduğunu `ultralytics` paketiyle gelen Platform istemcisiyle görebilirsiniz. `yolo login` yaptıysanız planınızı, kredinizi ve projelerinizi de listeler.
 
 ```bash
-python local_python/08_platform_tour.py status     # bulut GPU'larının anlık durumu
-python local_python/08_platform_tour.py whoami     # plan, kredi ve kayıt sayıları
-python local_python/08_platform_tour.py projects   # projeleriniz ve modelleriniz
-python local_python/08_platform_tour.py predict --model your_username/gdg-samsun/laptop-run --image bus.jpg
+python local_python/08_platform_tour.py
 ```
 
 ## Deneme alanı: Ultralytics YOLO ile neler yapılabilir :art:
@@ -232,7 +229,8 @@ python local_python/08_platform_tour.py predict --model your_username/gdg-samsun
 ### Yedi görev, tek API
 
 ```bash
-python local_python/03_all_tasks.py
+python local_python/03_all_tasks.py                                                       # yedi görev, runs/tasks klasörüne kaydedilir
+yolo predict model=yolo26n-pose.pt source=https://ultralytics.com/images/zidane.jpg        # CLI ile tek bir görev
 ```
 
 ```python
@@ -277,8 +275,10 @@ YOLO("yolo26n-pose.pt").predict("https://ultralytics.com/images/zidane.jpg", sav
 Her kişi video boyunca aynı ID numarasını korur. Altı takip algoritmasından birini seçebilirsiniz: `botsort`, `bytetrack`, `ocsort`, `deepocsort`, `fasttrack` ve `tracktrack`. Hepsi detect, segment, pose ve obb modelleriyle, dışa aktarılmış formatlar dahil, birlikte çalışır.
 
 ```bash
-python local_python/04_track.py --model yolo26n_openvino_model --device intel:gpu
-python local_python/04_track.py --source 0 --show                     # kendi webcam'iniz
+python local_python/04_track.py                                                # örnek videodaki kişiler
+yolo track model=yolo26n.pt source=video.mp4 tracker=bytetrack.yaml            # başka bir takip algoritması
+yolo track model=yolo26n_openvino_model source=video.mp4 device=intel:gpu      # Intel GPU üzerinde OpenVINO
+yolo track model=yolo26n.pt source=0 show=True                                 # kendi webcam'iniz
 ```
 
 <div class="wide" markdown>
@@ -288,10 +288,11 @@ python local_python/04_track.py --source 0 --show                     # kendi we
 ### Solutions ile gerçek hayattan örnekler
 
 ```bash
-python local_python/06_solutions.py --solution count     # çizgiyi geçen kişileri sayar
-python local_python/06_solutions.py --solution heatmap   # kişilerin en çok vakit geçirdiği alanları gösterir
-python local_python/06_solutions.py --solution blur      # gizlilik için bulanıklaştırır
-python local_python/06_solutions.py --solution speed     # hız tahmini yapar
+python local_python/06_solutions.py count        # çizgiyi geçen kişileri sayar
+python local_python/06_solutions.py heatmap      # kişilerin en çok vakit geçirdiği alanları gösterir
+python local_python/06_solutions.py blur         # gizlilik için bulanıklaştırır
+python local_python/06_solutions.py speed        # hız tahmini yapar
+yolo solutions heatmap source=video.mp4 show=True   # her çözüm doğrudan CLI ile de çalışır
 ```
 
 <div class="wide" markdown>
@@ -305,8 +306,13 @@ Elle etiketleme çok zaman alır. Kendi bilgisayarınızda Ultralytics YOLO nesn
 Ultralytics Platform ise tarayıcıdaki **Smart Annotation** özelliğiyle bir adım daha ileri gider. Nesnelere SAM 3.1 ile tıklayarak etiketleyebilir, hazır ya da kendi eğittiğiniz Ultralytics YOLO modellerini çalıştırabilir veya sınıf adlarını yazıp tüm veri setini bir görsel dil modeline etiketletebilirsiniz. Platform'da barındırılan sekiz açık kaynak modelden birini (varsayılan olarak Moondream 3.1) seçebilir ya da kendi sağlayıcı anahtarınızı ekleyerek OpenAI, Anthropic, Google ve diğer sağlayıcıların görsel modellerini kullanabilirsiniz.
 
 ```bash
-python local_python/07_auto_annotate.py
-python local_python/07_auto_annotate.py --images path/to/your/images --classes 0 2
+python local_python/07_auto_annotate.py      # kendi fotoğraflarınız için en üstteki IMAGES satırını değiştirin
+```
+
+```python
+from ultralytics.data.annotator import auto_annotate
+
+auto_annotate(data="path/to/images", det_model="yolo26n.pt", sam_model="sam2.1_b.pt")
 ```
 
 <div class="gallery" markdown>
@@ -325,17 +331,19 @@ python local_python/07_auto_annotate.py --images path/to/your/images --classes 0
 Atölyenin en sevilen bölümü burası. Kamerayı salona çevirin ve çıkarım motorlarını canlı olarak değiştirin.
 
 ```bash
-python local_python/05_webcam.py                                              # bu bilgisayardaki en uygun cihaz
-python local_python/05_webcam.py --model yolo26n_openvino_model --device intel:gpu
-python local_python/05_webcam.py --model yolo26n-pose.pt --track
+python local_python/05_webcam.py                                                  # en uygun cihazda FPS sayacı
+CAMERA=1 python local_python/05_webcam.py                                         # başka bir kamera
+yolo predict model=yolo26n_openvino_model source=0 device=intel:gpu show=True     # motoru canlı değiştirin
+yolo track model=yolo26n-pose.pt source=0 show=True                               # takip numaralarıyla poz tahmini
 ```
 
 ## Adım 2: Dışa aktarma ve büyük hız yarışı :package:
 
 ```bash
-python local_python/02_export_model.py                      # yolo26n.pt modelini ONNX ve OpenVINO'ya aktarır, sonra yarıştırır
-python local_python/02_export_model.py --weights runs/detect/gdg-samsun/laptop-run/weights/best.pt
-python local_python/02_export_model.py --tensorrt           # NVIDIA kartlarda TensorRT FP16 motorunu da ekler
+yolo export model=yolo26n.pt format=onnx simplify=True      # her yerde çalışır
+yolo export model=yolo26n.pt format=openvino                # Intel CPU, GPU ve NPU için
+yolo export model=yolo26n.pt format=engine half=True        # NVIDIA TensorRT FP16
+python local_python/02_export_model.py                      # dışa aktarır, sonra her formatı her cihazda yarıştırır
 ```
 
 ```python
@@ -351,24 +359,24 @@ YOLO("yolo26n_openvino_model").predict("bus.jpg", device="intel:npu")  # evet, N
 
 ### Atölye bilgisayarındaki sonuçlar
 
-Ölçümler Arc B390 grafik birimi ve dahili NPU bulunan Intel Core Ultra X7 358H işlemcide yapıldı. `yolo26n.pt` modeli 640 boyutunda, `bus.jpg` üzerinde 100 kez çalıştırıldı ve medyan değerler alındı.
+Bu tablo, Arc B390 grafik birimi ve dahili NPU bulunan Intel Core Ultra X7 358H işlemcide `02_export_model.py` betiğinin çıktısıdır. `yolo26n.pt` modeli 640 boyutunda, `bus.jpg` üzerinde 100 kez çalıştırıldı ve medyan değerler alındı. Uçtan uca süre, çıkarım süresine ön işleme ve son işlemeyi de ekler. FPS ise 1000'in uçtan uca süreye bölümüdür.
 
-| Format | Cihaz | Boyut (MB) | Çıkarım (ms) | Uçtan uca (ms) | FPS | Hızlanma | Nesne |
-|---|---|---:|---:|---:|---:|---:|---:|
-| PyTorch | cpu | 5.5 | 14.6 | 15.7 | 69 | 1.0x | 5 |
-| PyTorch | xpu | 5.5 | 3.2 | 5.3 | 312 | 4.6x | 5 |
-| ONNX | cpu | 9.9 | 42.4 | 83.6 | 24 | 0.3x | 5 |
-| OpenVINO | intel:cpu | 10.1 | 15.2 | 16.7 | 66 | 1.0x | 5 |
-| OpenVINO | intel:gpu | 10.1 | 1.9 | 3.0 | 532 | 7.8x | 5 |
-| OpenVINO | intel:npu | 10.1 | 3.2 | 4.7 | 316 | 4.6x | 5 |
+| Format | Cihaz | Çıkarım (ms) | Uçtan uca (ms) | FPS |
+|---|---|---:|---:|---:|
+| PyTorch | cpu | 14.39 | 15.50 | 65 |
+| PyTorch | xpu | 3.53 | 5.74 | 174 |
+| ONNX | cpu | 28.38 | 67.14 | 15 |
+| OpenVINO | intel:cpu | 14.31 | 15.71 | 64 |
+| OpenVINO | intel:gpu | 1.87 | 2.97 | 337 |
+| OpenVINO | intel:npu | 3.09 | 4.54 | 220 |
 
 !!! success "Öne çıkanlar"
 
-    Dahili Arc GPU üzerinde çalışan OpenVINO, CPU üzerindeki PyTorch'tan **7.8 kat daha hızlı**. NPU ise çok az enerji harcarken dizüstü GPU'sundaki PyTorch ile aynı hıza ulaşıyor. Bu yüzden sürekli açık kalan kameralar için ideal bir seçenek. Model ve doğruluk aynı kaldığı için tüm formatlar aynı kutuları buluyor.
+    Dahili Arc GPU üzerinde çalışan OpenVINO, CPU üzerindeki PyTorch'un **5 katı FPS** veriyor (65 yerine 337). NPU ise çok az enerji harcarken dizüstü GPU'sundaki PyTorch'u bile geçiyor (174 yerine 220 FPS). Bu yüzden sürekli açık kalan kameralar için ideal bir seçenek. Model ve ağırlıklar aynı, değişen tek şey çalışma ortamı.
 
 !!! info "NVIDIA GPU'nuz varsa"
 
-    `--tensorrt` parametresini eklediğinizde tabloya bir TensorRT FP16 satırı da eklenir. Colab'da T4 çalışma ortamını seçerseniz notebook bu adımı sizin için yapar. Rust da ONNX dosyasından doğrudan TensorRT FP16 çalıştırabilir, ayrıntılar Adım 3.4'te.
+    Yarış CUDA bulduğunda tabloya kendiliğinden bir TensorRT FP16 satırı ekler. Colab'da T4 çalışma ortamını seçerseniz notebook bu adımı sizin için yapar. Rust da ONNX dosyasından doğrudan TensorRT FP16 çalıştırabilir, ayrıntılar Adım 3.4'te.
 
 ## Adım 3: Ultralytics Inference ile yüksek hızda çalıştırma :crab:
 
@@ -525,7 +533,7 @@ Aynı bilgisayar ve aynı `yolo26n` modelleri kullanıldı. Her ölçüm 300 kez
 
 !!! success "Öne çıkanlar"
 
-    Rust uygulaması yalnızca **37 MB** boyutunda ve Python ortamına ihtiyaç duymuyor. Karşılaştırma için, atölyenin Python `.venv` klasörü 7.9 GB yer kaplıyor. Uçtan uca ölçümlerde Rust, Python'u GPU, NPU ve ONNX Runtime üzerinde geride bırakıyor. CPU'da ise thread sayısı ayarlandığında Python ile aynı seviyeye geliyor. Videoyu **1.4 kat daha hızlı** işliyor ve **3.3 kat daha az bellek** kullanıyor. CPU üzerindeki ONNX Runtime süresi Python'da 83.6 ms iken Rust'ta 16.3 ms'ye düşüyor.
+    Rust uygulaması yalnızca **37 MB** boyutunda ve Python ortamına ihtiyaç duymuyor. Karşılaştırma için, atölyenin Python `.venv` klasörü 7.9 GB yer kaplıyor. Uçtan uca ölçümlerde Rust, Python'u GPU, NPU ve ONNX Runtime üzerinde geride bırakıyor. CPU'da ise thread sayısı ayarlandığında Python ile aynı seviyeye geliyor. Videoyu **1.4 kat daha hızlı** işliyor ve **3.3 kat daha az bellek** kullanıyor. CPU üzerindeki ONNX Runtime süresi Python'da 67.14 ms iken Rust'ta 16.33 ms'ye düşüyor.
 
 !!! tip "Hibrit işlemcilerde CPU thread sayısı"
 
@@ -533,17 +541,17 @@ Aynı bilgisayar ve aynı `yolo26n` modelleri kullanıldı. Her ölçüm 300 kez
 
 ## Mini görevler :trophy:
 
-- [ ] `06_solutions.py --solution count --model yolo26n_openvino_model --device intel:npu` komutuyla kameranın önünden geçen kişileri NPU üzerinde sayın.
+- [ ] `yolo solutions count model=yolo26n_openvino_model device=intel:npu source=0 show=True` komutuyla kameranın önünden geçen kişileri NPU üzerinde sayın.
 - [ ] `02_export_model.py` ile kendi bilgisayarınızdaki en hızlı cihazı bulun ve sonuç tablosunu paylaşın.
 - [ ] Telefonunuzdan on fotoğraf seçip otomatik etiketleyin ve Ultralytics Platform'a veri seti olarak yükleyin.
-- [ ] `yolo26n-pose.pt` modeli ve `--track` seçeneğiyle webcam üzerinden arkadaşlarınızı takip edin.
+- [ ] `yolo track model=yolo26n-pose.pt source=0 show=True` komutuyla webcam üzerinden arkadaşlarınızı takip edin.
 - [ ] Rust uygulamasını derleyin ve kendi bilgisayarınızda Python'un FPS değerini geçin.
 
 ## Sorun giderme :wrench:
 
 ??? question "Webcam 0 numaralı cihazla açılmıyor"
 
-    Yeni dizüstü bilgisayarların çoğu kamerayı bir Intel IPU ve v4l2loopback cihazı üzerinden sunar. `v4l2-ctl --list-devices` komutuyla cihazları listeleyin ve loopback cihazının numarasını kullanın. Örneğin Python için `--camera 50`, `run_cli.sh` için `CAMERA=50` yazabilirsiniz.
+    Yeni dizüstü bilgisayarların çoğu kamerayı bir Intel IPU ve v4l2loopback cihazı üzerinden sunar. `v4l2-ctl --list-devices` komutuyla cihazları listeleyin ve loopback cihazının numarasını kullanın. Örneğin `05_webcam.py` ve `run_cli.sh` için `CAMERA=50`, `yolo` CLI için `source=50` yazabilirsiniz. Bu kameralarda `yolo` CLI penceresi birkaç saniye sonra donarsa, kareleri doğrudan OpenCV ile okuyan `05_webcam.py` betiğini kullanın.
 
 ??? question "OpenVINO intel:gpu ya da intel:npu cihazını listelemiyor"
 
@@ -566,16 +574,16 @@ Aynı bilgisayar ve aynı `yolo26n` modelleri kullanıldı. Her ölçüm 300 kez
 | Yol | Açıklama |
 |---|---|
 | `setup_env.sh` | CUDA, Intel XPU ya da CPU için PyTorch ile OpenVINO içeren `.venv` ortamını kurar |
-| `local_python/00_check_env.py` | Tüm hızlandırıcılar için ön koşul kontrolü yapar |
-| `local_python/01_hybrid_train.py` | Ultralytics Platform girişi ve hibrit eğitimi yürütür |
-| `local_python/02_export_model.py` | ONNX, OpenVINO ve TensorRT dışa aktarımı ile hız yarışını yapar |
+| `local_python/00_check_env.py` | PyTorch cihazınızı, OpenVINO cihazlarını, Rust CLI aracını ve Platform anahtarınızı gösterir |
+| `local_python/01_hybrid_train.py` | Canlı Ultralytics Platform metrikleriyle yerel eğitim yapar |
+| `local_python/02_export_model.py` | ONNX ve OpenVINO'ya aktarır, sonra her formatı her cihazda yarıştırır |
 | `local_python/03_all_tasks.py` | detect, segment, semantic, depth, classify, pose ve obb görevlerini çalıştırır |
-| `local_python/04_track.py` | Video ya da webcam üzerinde çoklu nesne takibi yapar |
+| `local_python/04_track.py` | Videodaki her kişiyi takip eder |
 | `local_python/05_webcam.py` | FPS sayacıyla canlı webcam görüntüsü gösterir |
 | `local_python/06_solutions.py` | Sayma, ısı haritası, gizlilik bulanıklaştırma ve hız tahmini yapar |
 | `local_python/07_auto_annotate.py` | Ultralytics YOLO ve SAM ile otomatik etiketleme yapar |
-| `local_python/08_platform_tour.py` | Ultralytics Platform Python istemcisini tanıtır |
-| `local_python/device_utils.py` | NVIDIA CUDA, Intel XPU, Apple MPS ve CPU arasından en uygun cihazı seçer |
+| `local_python/08_platform_tour.py` | Bulut GPU durumunu, hesabınızı ve projelerinizi gösterir |
+| `local_python/device_utils.py` | NVIDIA CUDA, Intel XPU, Apple MPS ya da CPU arasından seçim yapar |
 | `local_inference/` | `ultralytics-inference` için Rust Cargo projesi ve `run_cli.sh` betiği |
 | `notebooks/hybrid_yolo_workshop.ipynb` | Atölyenin tamamını Google Colab üzerinde sunar |
 | `tools/` | Notebook üretici ve yazım stili kontrol aracı |

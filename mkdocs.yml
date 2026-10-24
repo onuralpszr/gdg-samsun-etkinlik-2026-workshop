@@ -9,6 +9,7 @@ copyright: GDG Samsun DevFest 2026 workshop by Onuralp Sezer, code under AGPL 3.
 
 theme:
   name: material
+  language: en
   logo: assets/logos/gdg-mark.svg
   favicon: assets/logos/favicon.png
   font:
@@ -34,10 +35,27 @@ theme:
     - content.code.annotate
     - content.tabs.link
     - navigation.top
-    - navigation.instant
     - navigation.footer
     - search.highlight
     - toc.follow
+
+plugins:
+  - search
+  - i18n:
+      docs_structure: suffix
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+        - locale: tr
+          name: Türkçe
+          build: true
+          site_name: Hiçbir GPU Geride Kalmasın
+          site_description: Hibrit Ultralytics YOLO eğitimi ve hızlı çalıştırma, GDG Samsun DevFest 2026 atölyesi
+          copyright: GDG Samsun DevFest 2026 atölyesi, Onuralp Sezer, kod AGPL 3.0 lisanslı
+          nav_translations:
+            Workshop: Atölye
 
 extra_css:
   - stylesheets/gdg.css

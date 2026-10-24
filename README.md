@@ -8,6 +8,7 @@
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/onuralpszr/gdg-samsun-etkinlik-2026-workshop/blob/main/notebooks/hybrid_yolo_workshop.ipynb)
 [![Workshop page](https://img.shields.io/badge/Workshop-page-4285F4?logo=googlechrome&logoColor=white)](https://onuralpszr.github.io/gdg-samsun-etkinlik-2026-workshop/)
+[![Türkçe sayfa](https://img.shields.io/badge/Atölye-Türkçe-EA4335?logo=googlechrome&logoColor=white)](https://onuralpszr.github.io/gdg-samsun-etkinlik-2026-workshop/tr/)
 [![Ultralytics Platform](https://img.shields.io/badge/Ultralytics-Platform-042AFF)](https://platform.ultralytics.com)
 [![Ultralytics Inference](https://img.shields.io/crates/v/ultralytics-inference?label=ultralytics-inference&logo=rust&color=EA4335)](https://crates.io/crates/ultralytics-inference)
 [![Pages](https://github.com/onuralpszr/gdg-samsun-etkinlik-2026-workshop/actions/workflows/pages.yml/badge.svg)](https://github.com/onuralpszr/gdg-samsun-etkinlik-2026-workshop/actions/workflows/pages.yml)

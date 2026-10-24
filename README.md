@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/logos/gdg-samsun.svg" alt="GDG Samsun DevFest 2026" height="64"> <img src="docs/assets/logos/ultralytics-logo.svg" alt="Ultralytics" height="48">
+<picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/logos/gdg-samsun-white.svg"><img src="docs/assets/logos/gdg-samsun.svg" alt="GDG Samsun DevFest 2026" height="64"></picture> <picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/logos/ultralytics-logo-white.svg"><img src="docs/assets/logos/ultralytics-logo.svg" alt="Ultralytics" height="48"></picture>
 
 # No GPU Left Behind
 
@@ -12,6 +12,8 @@
 [![Ultralytics Platform](https://img.shields.io/badge/Ultralytics-Platform-042AFF)](https://platform.ultralytics.com)
 [![Ultralytics Inference](https://img.shields.io/crates/v/ultralytics-inference?label=ultralytics-inference&logo=rust&color=EA4335)](https://crates.io/crates/ultralytics-inference)
 [![Pages](https://github.com/onuralpszr/gdg-samsun-etkinlik-2026-workshop/actions/workflows/pages.yml/badge.svg)](https://github.com/onuralpszr/gdg-samsun-etkinlik-2026-workshop/actions/workflows/pages.yml)
+
+<img src="docs/assets/img/tasks.gif" alt="Seven Ultralytics YOLO26 tasks from one API" width="640">
 
 </div>
 
@@ -170,9 +172,13 @@ Ten epochs on `coco8.yaml` take about **18 seconds** on a laptop GPU and reach *
 
 ```bash
 yolo export model=yolo26n.pt format=onnx simplify=True      # runs everywhere
-yolo export model=yolo26n.pt format=openvino                # Intel CPU, GPU and NPU
+
+# Intel CPU, GPU and NPU
+yolo export model=yolo26n.pt format=openvino
 yolo export model=yolo26n.pt format=engine half=True        # NVIDIA TensorRT FP16
-python local_python/02_export_model.py                      # export, then race every format on every device
+
+# export, then race every format on every device
+python local_python/02_export_model.py
 ```
 
 Output of `02_export_model.py` on an Intel Core Ultra X7 358H with Arc B390 graphics and the built in NPU, `yolo26n.pt` at 640, median of 100 runs. FPS is 1000 divided by the end to end time.
@@ -203,13 +209,19 @@ Output of `02_export_model.py` on an Intel Core Ultra X7 358H with Arc B390 grap
 cargo install ultralytics-inference --features "openvino-native,video"
 export LD_LIBRARY_PATH=$(python -c "import openvino, os; print(os.path.dirname(openvino.__file__))")/libs
 
-ultralytics-inference predict --model yolo26n.onnx --source bus.jpg                          # single image
-ultralytics-inference predict --model yolo26n.onnx --source images/ --batch 4                # batch
+# single image
+ultralytics-inference predict --model yolo26n.onnx --source bus.jpg
+
+# batch
+ultralytics-inference predict --model yolo26n.onnx --source images/ --batch 4
 ultralytics-inference predict --model yolo26n_openvino_model --device intel:gpu --source video.mp4
 ultralytics-inference predict --model yolo26n_openvino_model --device intel:npu --source 0 --show
-ultralytics-inference predict --model yolo26n.onnx --device tensorrt:0 --quantize 16 --source bus.jpg   # NVIDIA TensorRT FP16 from ONNX, build with --features nvidia
 
-./local_inference/run_cli.sh all                                                              # the whole tour
+# NVIDIA TensorRT FP16 from ONNX, build with --features nvidia
+ultralytics-inference predict --model yolo26n.onnx --device tensorrt:0 --quantize 16 --source bus.jpg
+
+# the whole tour
+./local_inference/run_cli.sh all
 ```
 
 All seven tasks work in Rust too. `./local_inference/run_cli.sh tasks` runs each one and saves the results under `runs/<task>/`:
@@ -234,6 +246,8 @@ The Cargo project in `local_inference/` uses the crate directly with image, batc
 cargo build --release --manifest-path local_inference/Cargo.toml --features "openvino,video"
 DEVICE=intel:gpu local_inference/target/release/gdg-inference video yolo26n_openvino_model video.mp4
 ```
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="docs/assets/img/fps_en_dark.png"><img src="docs/assets/img/fps_en_light.png" alt="Python and Rust frames per second on each engine and device" width="100%"></picture>
 
 | Engine | Device | Inference (ms) | End to end (ms) | FPS |
 |---|---|---:|---:|---:|
@@ -270,7 +284,7 @@ The Rust binary is 37 MB with no Python at runtime. It runs video 1.4x faster wi
 | `local_inference/run_cli.sh` | `ultralytics-inference` CLI tour |
 | `notebooks/hybrid_yolo_workshop.ipynb` | The whole workshop in Google Colab |
 | `docs/` | GitHub Pages site built with MkDocs Material |
-| `tools/` | Notebook generator and prose style checker |
+| `tools/` | Notebook generator, page charts and GIFs, and the prose style checker |
 | `.github/workflows/pages.yml` | Deploys the docs on every push to `main` |
 
 ## Build the docs locally

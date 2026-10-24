@@ -103,7 +103,9 @@ flowchart TB
     ```bash
     git clone https://github.com/onuralpszr/gdg-samsun-etkinlik-2026-workshop.git
     cd gdg-samsun-etkinlik-2026-workshop
-    ./setup_env.sh          # Intel GPU and NPU laptops (PyTorch XPU plus OpenVINO)
+
+    # Intel GPU and NPU laptops (PyTorch XPU plus OpenVINO)
+    ./setup_env.sh
     ./setup_env.sh cuda     # NVIDIA machines
     ./setup_env.sh cpu      # Apple silicon (MPS) and any other machine
     source .venv/bin/activate
@@ -116,7 +118,9 @@ flowchart TB
     cd gdg-samsun-etkinlik-2026-workshop
     uv venv --python 3.13 .venv
     .venv\Scripts\activate
-    uv pip install torch torchvision --index-url https://download.pytorch.org/whl/xpu   # or whl/cu130 for NVIDIA, whl/cpu for CPU only
+
+    # or whl/cu130 for NVIDIA, whl/cpu for CPU only
+    uv pip install torch torchvision --index-url https://download.pytorch.org/whl/xpu
     uv pip install -r requirements.txt
     python local_python/00_check_env.py
     ```
@@ -145,6 +149,7 @@ flowchart TB
 
 ```bash
 yolo login ul_your_api_key
+
 # or for one shell session
 export ULTRALYTICS_API_KEY=ul_your_api_key
 ```
@@ -157,6 +162,7 @@ The magic switch is `project="username/project"`. Training runs on **your** hard
 
     ```bash
     # device=0 for NVIDIA CUDA, device=xpu for Intel GPU, device=mps for Apple silicon, device=cpu for any machine
+
     yolo train model=yolo26n.pt data=coco8.yaml epochs=10 device=0 project=your_username/gdg-samsun name=laptop-run
     ```
 
@@ -229,8 +235,11 @@ python local_python/08_platform_tour.py
 ### Seven tasks, one API
 
 ```bash
-python local_python/03_all_tasks.py                                                       # all seven, saved in runs/tasks
-yolo predict model=yolo26n-pose.pt source=https://ultralytics.com/images/zidane.jpg        # one task from the CLI
+# all seven, saved in runs/tasks
+python local_python/03_all_tasks.py
+
+# one task from the CLI
+yolo predict model=yolo26n-pose.pt source=https://ultralytics.com/images/zidane.jpg
 ```
 
 ```python
@@ -275,10 +284,17 @@ YOLO("yolo26n-pose.pt").predict("https://ultralytics.com/images/zidane.jpg", sav
 Every person keeps the same ID across frames. Pick from six trackers (`botsort`, `bytetrack`, `ocsort`, `deepocsort`, `fasttrack` and `tracktrack`) with any detect, segment, pose or obb model and with exported formats too.
 
 ```bash
-python local_python/04_track.py                                                # people in the sample video
-yolo track model=yolo26n.pt source=video.mp4 tracker=bytetrack.yaml            # another tracker
-yolo track model=yolo26n_openvino_model source=video.mp4 device=intel:gpu      # OpenVINO on the Intel GPU
-yolo track model=yolo26n.pt source=0 show=True                                 # your webcam
+# people in the sample video
+python local_python/04_track.py
+
+# another tracker
+yolo track model=yolo26n.pt source=video.mp4 tracker=bytetrack.yaml
+
+# OpenVINO on the Intel GPU
+yolo track model=yolo26n_openvino_model source=video.mp4 device=intel:gpu
+
+# your webcam
+yolo track model=yolo26n.pt source=0 show=True
 ```
 
 <div class="wide" markdown>
@@ -292,7 +308,9 @@ python local_python/06_solutions.py count        # people crossing a line
 python local_python/06_solutions.py heatmap      # where people spend time
 python local_python/06_solutions.py blur         # privacy blur
 python local_python/06_solutions.py speed        # speed estimation
-yolo solutions heatmap source=video.mp4 show=True   # any solution straight from the CLI
+
+# any solution straight from the CLI
+yolo solutions heatmap source=video.mp4 show=True
 ```
 
 <div class="wide" markdown>
@@ -306,7 +324,8 @@ Labeling by hand is slow. On your own machine, Ultralytics YOLO finds the object
 The Ultralytics Platform goes further with **Smart Annotation** right in the browser. Click objects with SAM 3.1, run pretrained or your own fine tuned Ultralytics YOLO models, or type the class names and let a vision language model label the whole dataset. Pick one of the eight hosted open source models (Moondream 3.1 by default) or add your own provider key to use vision models from OpenAI, Anthropic, Google and more.
 
 ```bash
-python local_python/07_auto_annotate.py      # set IMAGES at the top to label your own photos
+# set IMAGES at the top to label your own photos
+python local_python/07_auto_annotate.py
 ```
 
 ```python
@@ -331,19 +350,30 @@ auto_annotate(data="path/to/images", det_model="yolo26n.pt", sam_model="sam2.1_b
 The crowd favorite. Point the camera at the room and switch engines live.
 
 ```bash
-python local_python/05_webcam.py                                                  # FPS counter on the best device
-CAMERA=1 python local_python/05_webcam.py                                         # another camera
-yolo predict model=yolo26n_openvino_model source=0 device=intel:gpu show=True     # switch engines live
-yolo track model=yolo26n-pose.pt source=0 show=True                               # pose with tracking IDs
+# FPS counter on the best device
+python local_python/05_webcam.py
+
+# another camera
+CAMERA=1 python local_python/05_webcam.py
+
+# switch engines live
+yolo predict model=yolo26n_openvino_model source=0 device=intel:gpu show=True
+
+# pose with tracking IDs
+yolo track model=yolo26n-pose.pt source=0 show=True
 ```
 
 ## Step 2: Export and the great speed race :package:
 
 ```bash
 yolo export model=yolo26n.pt format=onnx simplify=True      # runs everywhere
-yolo export model=yolo26n.pt format=openvino                # Intel CPU, GPU and NPU
+
+# Intel CPU, GPU and NPU
+yolo export model=yolo26n.pt format=openvino
 yolo export model=yolo26n.pt format=engine half=True        # NVIDIA TensorRT FP16
-python local_python/02_export_model.py                      # export, then race every format on every device
+
+# export, then race every format on every device
+python local_python/02_export_model.py
 ```
 
 ```python
@@ -401,17 +431,27 @@ cargo install ultralytics-inference --features "openvino-native,video"
 # OpenVINO native needs to find the runtime, the pip package works fine
 export LD_LIBRARY_PATH=$(python -c "import openvino, os; print(os.path.dirname(openvino.__file__))")/libs
 
-ultralytics-inference predict --model yolo26n.onnx --source bus.jpg                         # single image
-ultralytics-inference predict --model yolo26n.onnx --source images/ --batch 4               # a folder
+# single image
+ultralytics-inference predict --model yolo26n.onnx --source bus.jpg
+
+# a folder
+ultralytics-inference predict --model yolo26n.onnx --source images/ --batch 4
+
+# a video on the Intel GPU
 ultralytics-inference predict --model yolo26n_openvino_model --device intel:gpu --source video.mp4
+
+# the webcam on the NPU
 ultralytics-inference predict --model yolo26n_openvino_model --device intel:npu --source 0 --show
-ultralytics-inference predict --task pose                                                    # any task, model auto downloads
+
+# any task, model auto downloads
+ultralytics-inference predict --task pose
 ```
 
 Or let the workshop script drive it:
 
 ```bash
-./local_inference/run_cli.sh all          # image, batch, video, all tasks, Intel devices and the Rust app
+# image, batch, video, all tasks, Intel devices and the Rust app
+./local_inference/run_cli.sh all
 CAMERA=50 ./local_inference/run_cli.sh webcam
 ```
 
@@ -445,9 +485,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 ```bash
 cargo build --release --manifest-path local_inference/Cargo.toml --features "openvino,video"
 BIN=local_inference/target/release/gdg-inference
-$BIN image yolo26n.onnx bus.jpg                                       # single image
-$BIN batch yolo26n.onnx datasets/coco8/images/val 4                    # folder in batches
-DEVICE=intel:gpu $BIN video yolo26n_openvino_model video.mp4           # video, webcam or RTSP
+
+# single image
+$BIN image yolo26n.onnx bus.jpg
+
+# folder in batches
+$BIN batch yolo26n.onnx datasets/coco8/images/val 4
+
+# video, webcam or RTSP
+DEVICE=intel:gpu $BIN video yolo26n_openvino_model video.mp4
 DEVICE=intel:npu $BIN bench yolo26n_openvino_model bus.jpg 300         # latency
 ```
 
@@ -456,8 +502,11 @@ DEVICE=intel:npu $BIN bench yolo26n_openvino_model bus.jpg 300         # latency
 Pass `--task` and the CLI downloads the matching YOLO26 nano model, runs it on the sample images and saves the annotated results under `runs/<task>/`. Every picture below was drawn by the Rust CLI on the workshop laptop, with no Python involved.
 
 ```bash
-./local_inference/run_cli.sh tasks                                    # all seven tasks in one go
-ultralytics-inference predict --task segment --source bus.jpg         # one task on your own image
+# all seven tasks in one go
+./local_inference/run_cli.sh tasks
+
+# one task on your own image
+ultralytics-inference predict --task segment --source bus.jpg
 ```
 
 <div class="gallery" markdown>
@@ -500,7 +549,9 @@ cargo install ultralytics-inference --features "nvidia,video"
 ultralytics-inference predict --model yolo26n.onnx --source bus.jpg --device tensorrt:0 --quantize 16
 
 cargo build --release --manifest-path local_inference/Cargo.toml --features "nvidia,video"
-DEVICE=tensorrt:0 local_inference/target/release/gdg-inference bench yolo26n.onnx bus.jpg 300   # FP16 by default
+
+# FP16 by default
+DEVICE=tensorrt:0 local_inference/target/release/gdg-inference bench yolo26n.onnx bus.jpg 300
 ```
 
 ```rust
@@ -515,6 +566,11 @@ let mut model = YOLOModel::load_with_config("yolo26n.onnx", config)?;
 ### Results: Python vs Rust
 
 Same laptop, same `yolo26n` exports, best of three medians over 300 runs.
+
+<div class="wide" markdown>
+![Python and Rust frames per second on each engine and device](assets/img/fps_en_light.png#only-light)
+![Python and Rust frames per second on each engine and device](assets/img/fps_en_dark.png#only-dark)
+</div>
 
 | Engine | Device | Inference (ms) | End to end (ms) | FPS |
 |---|---|---:|---:|---:|
@@ -586,7 +642,7 @@ Video throughput and memory on a 620 frame crowd clip:
 | `local_python/device_utils.py` | Picks NVIDIA CUDA, Intel XPU, Apple MPS or CPU |
 | `local_inference/` | Rust Cargo project plus `run_cli.sh` for `ultralytics-inference` |
 | `notebooks/hybrid_yolo_workshop.ipynb` | The whole workshop in Google Colab |
-| `tools/` | Notebook generator and prose style checker |
+| `tools/` | Notebook generator, page charts and GIFs, and the prose style checker |
 
 ## Stay in touch :handshake:
 

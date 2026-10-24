@@ -103,7 +103,9 @@ flowchart TB
     ```bash
     git clone https://github.com/onuralpszr/gdg-samsun-etkinlik-2026-workshop.git
     cd gdg-samsun-etkinlik-2026-workshop
-    ./setup_env.sh          # Intel GPU ve NPU bulunan dizüstüler (PyTorch XPU ve OpenVINO)
+
+    # Intel GPU ve NPU bulunan dizüstüler (PyTorch XPU ve OpenVINO)
+    ./setup_env.sh
     ./setup_env.sh cuda     # NVIDIA ekran kartlı bilgisayarlar
     ./setup_env.sh cpu      # Apple silicon (MPS) ve diğer tüm bilgisayarlar
     source .venv/bin/activate
@@ -116,7 +118,9 @@ flowchart TB
     cd gdg-samsun-etkinlik-2026-workshop
     uv venv --python 3.13 .venv
     .venv\Scripts\activate
-    uv pip install torch torchvision --index-url https://download.pytorch.org/whl/xpu   # NVIDIA için whl/cu130, sadece CPU için whl/cpu
+
+    # NVIDIA için whl/cu130, sadece CPU için whl/cpu
+    uv pip install torch torchvision --index-url https://download.pytorch.org/whl/xpu
     uv pip install -r requirements.txt
     python local_python/00_check_env.py
     ```
@@ -145,6 +149,7 @@ flowchart TB
 
 ```bash
 yolo login ul_your_api_key
+
 # ya da yalnızca bu terminal oturumu için
 export ULTRALYTICS_API_KEY=ul_your_api_key
 ```
@@ -157,6 +162,7 @@ export ULTRALYTICS_API_KEY=ul_your_api_key
 
     ```bash
     # NVIDIA CUDA için device=0, Intel GPU için device=xpu, Apple silicon için device=mps, her bilgisayarda device=cpu
+
     yolo train model=yolo26n.pt data=coco8.yaml epochs=10 device=0 project=your_username/gdg-samsun name=laptop-run
     ```
 
@@ -229,8 +235,11 @@ python local_python/08_platform_tour.py
 ### Yedi görev, tek API
 
 ```bash
-python local_python/03_all_tasks.py                                                       # yedi görev, runs/tasks klasörüne kaydedilir
-yolo predict model=yolo26n-pose.pt source=https://ultralytics.com/images/zidane.jpg        # CLI ile tek bir görev
+# yedi görev, runs/tasks klasörüne kaydedilir
+python local_python/03_all_tasks.py
+
+# CLI ile tek bir görev
+yolo predict model=yolo26n-pose.pt source=https://ultralytics.com/images/zidane.jpg
 ```
 
 ```python
@@ -275,10 +284,17 @@ YOLO("yolo26n-pose.pt").predict("https://ultralytics.com/images/zidane.jpg", sav
 Her kişi video boyunca aynı ID numarasını korur. Altı takip algoritmasından birini seçebilirsiniz: `botsort`, `bytetrack`, `ocsort`, `deepocsort`, `fasttrack` ve `tracktrack`. Hepsi detect, segment, pose ve obb modelleriyle, dışa aktarılmış formatlar dahil, birlikte çalışır.
 
 ```bash
-python local_python/04_track.py                                                # örnek videodaki kişiler
-yolo track model=yolo26n.pt source=video.mp4 tracker=bytetrack.yaml            # başka bir takip algoritması
-yolo track model=yolo26n_openvino_model source=video.mp4 device=intel:gpu      # Intel GPU üzerinde OpenVINO
-yolo track model=yolo26n.pt source=0 show=True                                 # kendi webcam'iniz
+# örnek videodaki kişiler
+python local_python/04_track.py
+
+# başka bir takip algoritması
+yolo track model=yolo26n.pt source=video.mp4 tracker=bytetrack.yaml
+
+# Intel GPU üzerinde OpenVINO
+yolo track model=yolo26n_openvino_model source=video.mp4 device=intel:gpu
+
+# kendi webcam'iniz
+yolo track model=yolo26n.pt source=0 show=True
 ```
 
 <div class="wide" markdown>
@@ -289,10 +305,14 @@ yolo track model=yolo26n.pt source=0 show=True                                 #
 
 ```bash
 python local_python/06_solutions.py count        # çizgiyi geçen kişileri sayar
-python local_python/06_solutions.py heatmap      # kişilerin en çok vakit geçirdiği alanları gösterir
+
+# kişilerin en çok vakit geçirdiği alanları gösterir
+python local_python/06_solutions.py heatmap
 python local_python/06_solutions.py blur         # gizlilik için bulanıklaştırır
 python local_python/06_solutions.py speed        # hız tahmini yapar
-yolo solutions heatmap source=video.mp4 show=True   # her çözüm doğrudan CLI ile de çalışır
+
+# her çözüm doğrudan CLI ile de çalışır
+yolo solutions heatmap source=video.mp4 show=True
 ```
 
 <div class="wide" markdown>
@@ -306,7 +326,8 @@ Elle etiketleme çok zaman alır. Kendi bilgisayarınızda Ultralytics YOLO nesn
 Ultralytics Platform ise tarayıcıdaki **Smart Annotation** özelliğiyle bir adım daha ileri gider. Nesnelere SAM 3.1 ile tıklayarak etiketleyebilir, hazır ya da kendi eğittiğiniz Ultralytics YOLO modellerini çalıştırabilir veya sınıf adlarını yazıp tüm veri setini bir görsel dil modeline etiketletebilirsiniz. Platform'da barındırılan sekiz açık kaynak modelden birini (varsayılan olarak Moondream 3.1) seçebilir ya da kendi sağlayıcı anahtarınızı ekleyerek OpenAI, Anthropic, Google ve diğer sağlayıcıların görsel modellerini kullanabilirsiniz.
 
 ```bash
-python local_python/07_auto_annotate.py      # kendi fotoğraflarınız için en üstteki IMAGES satırını değiştirin
+# kendi fotoğraflarınız için en üstteki IMAGES satırını değiştirin
+python local_python/07_auto_annotate.py
 ```
 
 ```python
@@ -331,19 +352,30 @@ auto_annotate(data="path/to/images", det_model="yolo26n.pt", sam_model="sam2.1_b
 Atölyenin en sevilen bölümü burası. Kamerayı salona çevirin ve çıkarım motorlarını canlı olarak değiştirin.
 
 ```bash
-python local_python/05_webcam.py                                                  # en uygun cihazda FPS sayacı
-CAMERA=1 python local_python/05_webcam.py                                         # başka bir kamera
-yolo predict model=yolo26n_openvino_model source=0 device=intel:gpu show=True     # motoru canlı değiştirin
-yolo track model=yolo26n-pose.pt source=0 show=True                               # takip numaralarıyla poz tahmini
+# en uygun cihazda FPS sayacı
+python local_python/05_webcam.py
+
+# başka bir kamera
+CAMERA=1 python local_python/05_webcam.py
+
+# motoru canlı değiştirin
+yolo predict model=yolo26n_openvino_model source=0 device=intel:gpu show=True
+
+# takip numaralarıyla poz tahmini
+yolo track model=yolo26n-pose.pt source=0 show=True
 ```
 
 ## Adım 2: Dışa aktarma ve büyük hız yarışı :package:
 
 ```bash
 yolo export model=yolo26n.pt format=onnx simplify=True      # her yerde çalışır
-yolo export model=yolo26n.pt format=openvino                # Intel CPU, GPU ve NPU için
+
+# Intel CPU, GPU ve NPU için
+yolo export model=yolo26n.pt format=openvino
 yolo export model=yolo26n.pt format=engine half=True        # NVIDIA TensorRT FP16
-python local_python/02_export_model.py                      # dışa aktarır, sonra her formatı her cihazda yarıştırır
+
+# dışa aktarır, sonra her formatı her cihazda yarıştırır
+python local_python/02_export_model.py
 ```
 
 ```python
@@ -401,17 +433,27 @@ cargo install ultralytics-inference --features "openvino-native,video"
 # OpenVINO native altyapısının çalışma kütüphanesini bulması gerekir, pip paketi bunun için yeterlidir
 export LD_LIBRARY_PATH=$(python -c "import openvino, os; print(os.path.dirname(openvino.__file__))")/libs
 
-ultralytics-inference predict --model yolo26n.onnx --source bus.jpg                         # tek görsel
-ultralytics-inference predict --model yolo26n.onnx --source images/ --batch 4               # bir klasör
+# tek görsel
+ultralytics-inference predict --model yolo26n.onnx --source bus.jpg
+
+# bir klasör
+ultralytics-inference predict --model yolo26n.onnx --source images/ --batch 4
+
+# Intel GPU üzerinde bir video
 ultralytics-inference predict --model yolo26n_openvino_model --device intel:gpu --source video.mp4
+
+# NPU üzerinde webcam
 ultralytics-inference predict --model yolo26n_openvino_model --device intel:npu --source 0 --show
-ultralytics-inference predict --task pose                                                    # istediğiniz görev, model otomatik iner
+
+# istediğiniz görev, model otomatik iner
+ultralytics-inference predict --task pose
 ```
 
 İsterseniz tüm adımları atölye betiğine bırakabilirsiniz:
 
 ```bash
-./local_inference/run_cli.sh all          # görsel, klasör, video, tüm görevler, Intel cihazları ve Rust uygulaması
+# görsel, klasör, video, tüm görevler, Intel cihazları ve Rust uygulaması
+./local_inference/run_cli.sh all
 CAMERA=50 ./local_inference/run_cli.sh webcam
 ```
 
@@ -446,9 +488,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 cargo build --release --manifest-path local_inference/Cargo.toml --features "openvino,video"
 BIN=local_inference/target/release/gdg-inference
 $BIN image yolo26n.onnx bus.jpg                                       # tek görsel
-$BIN batch yolo26n.onnx datasets/coco8/images/val 4                    # klasördeki görselleri gruplar halinde işler
-DEVICE=intel:gpu $BIN video yolo26n_openvino_model video.mp4           # video, webcam ya da RTSP yayını
-DEVICE=intel:npu $BIN bench yolo26n_openvino_model bus.jpg 300         # gecikme ölçümü
+
+# klasördeki görselleri gruplar halinde işler
+$BIN batch yolo26n.onnx datasets/coco8/images/val 4
+
+# video, webcam ya da RTSP yayını
+DEVICE=intel:gpu $BIN video yolo26n_openvino_model video.mp4
+
+# gecikme ölçümü
+DEVICE=intel:npu $BIN bench yolo26n_openvino_model bus.jpg 300
 ```
 
 ### 3.3 Rust ile yedi görevin tamamı
@@ -456,8 +504,11 @@ DEVICE=intel:npu $BIN bench yolo26n_openvino_model bus.jpg 300         # gecikme
 `--task` parametresini verdiğinizde CLI ilgili YOLO26 nano modelini indirir, örnek görseller üzerinde çalıştırır ve sonuçları `runs/<task>/` klasörüne kaydeder. Aşağıdaki tüm görseller atölye bilgisayarında Rust CLI ile, hiç Python kullanılmadan üretildi.
 
 ```bash
-./local_inference/run_cli.sh tasks                                    # yedi görevi tek seferde çalıştırır
-ultralytics-inference predict --task segment --source bus.jpg         # tek bir görevi kendi görselinizde çalıştırır
+# yedi görevi tek seferde çalıştırır
+./local_inference/run_cli.sh tasks
+
+# tek bir görevi kendi görselinizde çalıştırır
+ultralytics-inference predict --task segment --source bus.jpg
 ```
 
 <div class="gallery" markdown>
@@ -500,7 +551,9 @@ cargo install ultralytics-inference --features "nvidia,video"
 ultralytics-inference predict --model yolo26n.onnx --source bus.jpg --device tensorrt:0 --quantize 16
 
 cargo build --release --manifest-path local_inference/Cargo.toml --features "nvidia,video"
-DEVICE=tensorrt:0 local_inference/target/release/gdg-inference bench yolo26n.onnx bus.jpg 300   # varsayılan olarak FP16
+
+# varsayılan olarak FP16
+DEVICE=tensorrt:0 local_inference/target/release/gdg-inference bench yolo26n.onnx bus.jpg 300
 ```
 
 ```rust
@@ -515,6 +568,11 @@ let mut model = YOLOModel::load_with_config("yolo26n.onnx", config)?;
 ### Sonuçlar: Python ve Rust karşılaştırması
 
 Aynı bilgisayar ve aynı `yolo26n` modelleri kullanıldı. Her ölçüm 300 kez çalıştırıldı ve üç denemenin en iyi medyan değeri alındı.
+
+<div class="wide" markdown>
+![Her motor ve cihazda Python ile Rust saniyedeki kare sayısı](assets/img/fps_tr_light.png#only-light)
+![Her motor ve cihazda Python ile Rust saniyedeki kare sayısı](assets/img/fps_tr_dark.png#only-dark)
+</div>
 
 | Motor | Cihaz | Çıkarım (ms) | Uçtan uca (ms) | FPS |
 |---|---|---:|---:|---:|
@@ -586,7 +644,7 @@ Aynı bilgisayar ve aynı `yolo26n` modelleri kullanıldı. Her ölçüm 300 kez
 | `local_python/device_utils.py` | NVIDIA CUDA, Intel XPU, Apple MPS ya da CPU arasından seçim yapar |
 | `local_inference/` | `ultralytics-inference` için Rust Cargo projesi ve `run_cli.sh` betiği |
 | `notebooks/hybrid_yolo_workshop.ipynb` | Atölyenin tamamını Google Colab üzerinde sunar |
-| `tools/` | Notebook üretici ve yazım stili kontrol aracı |
+| `tools/` | Notebook üretici, sayfa grafikleri ve GIF dosyaları ile yazım stili kontrol aracı |
 
 ## İletişimde kalalım :handshake:
 

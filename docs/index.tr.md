@@ -31,7 +31,7 @@ Ciddi bir bilgisayarlı görü projesi için dev bir GPU'ya ihtiyacınız yok. B
 <div class="steps" markdown>
 <div class="card" markdown>
 <strong>:key: Adım 0 Kurulum</strong>
-Tek bir betik PyTorch XPU, CUDA ya da CPU ile birlikte OpenVINO içeren bir `.venv` ortamı kurar ve bilgisayarınızdaki tüm hızlandırıcıları kontrol eder.
+Tek bir betik, donanımınıza uygun PyTorch sürümünü ve OpenVINO'yu içeren bir `.venv` ortamı kurar ve bilgisayarınızdaki tüm hızlandırıcıları kontrol eder.
 </div>
 <div class="card" markdown>
 <strong>:weight_lifter: Adım 1 Eğitim</strong>
@@ -65,7 +65,7 @@ Aynı modeli `ultralytics-inference` CLI aracı ve Rust kütüphanesi ile çalı
 flowchart TB
     subgraph Data["Veri"]
         direction LR
-        A[Görselleriniz] --> B[YOLO ve SAM ile otomatik etiketleme]
+        A[Görselleriniz] --> B[YOLO, SAM ya da görsel dil modelleriyle otomatik etiketleme]
         B --> C[(Ultralytics Platform veri seti)]
     end
     subgraph Train["Adım 1 Eğitim"]
@@ -104,7 +104,7 @@ flowchart TB
     cd gdg-samsun-etkinlik-2026-workshop
     ./setup_env.sh          # Intel GPU ve NPU bulunan dizüstüler (PyTorch XPU ve OpenVINO)
     ./setup_env.sh cuda     # NVIDIA ekran kartlı bilgisayarlar
-    ./setup_env.sh cpu      # diğer tüm bilgisayarlar
+    ./setup_env.sh cpu      # Apple silicon (MPS) ve diğer tüm bilgisayarlar
     source .venv/bin/activate
     ```
 
@@ -115,7 +115,7 @@ flowchart TB
     cd gdg-samsun-etkinlik-2026-workshop
     uv venv --python 3.13 .venv
     .venv\Scripts\activate
-    uv pip install torch torchvision --index-url https://download.pytorch.org/whl/xpu
+    uv pip install torch torchvision --index-url https://download.pytorch.org/whl/xpu   # NVIDIA için whl/cu130, sadece CPU için whl/cpu
     uv pip install -r requirements.txt
     python local_python/00_check_env.py
     ```
@@ -124,27 +124,7 @@ flowchart TB
 
     Sayfanın en üstündeki **Colab'da aç** düğmesine basın ve **Runtime > Change runtime type > T4 GPU** seçeneğini seçin. Bu yolda bilgisayarınıza hiçbir şey kurmanız gerekmez.
 
-Kontrol betiği bulduğu tüm hızlandırıcıları listeler. Atölye bilgisayarında, giriş yapmadan önce alınan çıktı şöyle:
-
-```text
-[OK  ] Python                       3.13.16
-[OK  ] PyTorch                      2.14.1+xpu
-[MISS] NVIDIA CUDA
-[OK  ] Intel XPU (PyTorch)          Intel(R) Arc(TM) B390 GPU
-[MISS] Apple MPS
-[OK  ] Ultralytics YOLO             8.4.184
-[OK  ] OpenVINO                     2026.4.1 devices: CPU, GPU, NPU
-[OK  ] Intel NPU (OpenVINO)         ready for intel:npu
-[OK  ] ONNX Runtime                 1.31.0 providers: AzureExecutionProvider, CPUExecutionProvider
-[OK  ] Rust cargo                   needed for Step 3
-[OK  ] ultralytics-inference CLI    cargo install ultralytics-inference
-[MISS] Ultralytics Platform key     run: yolo login YOUR_API_KEY
-
-Recommended training device: --device xpu
-Recommended fast inference: OpenVINO on intel:gpu or intel:npu when you have Intel silicon
-```
-
-Son satırdaki `MISS` ifadesi, Adım 1.1'i tamamladığınızda `OK` olarak değişir.
+Kontrol betiği PyTorch sürümünü ve bulabildiği tüm hızlandırıcıları listeler. NVIDIA CUDA, Intel XPU ve Apple MPS ile OpenVINO'nun CPU, GPU ve NPU cihazları bu listede yer alır. Ayrıca ONNX Runtime, Rust ve Ultralytics Platform anahtarınızı da kontrol eder, ardından bilgisayarınız için en uygun eğitim ve çıkarım cihazını önerir.
 
 !!! tip "Başlamadan önce kontrol listesi"
 
@@ -175,10 +155,10 @@ export ULTRALYTICS_API_KEY=ul_your_api_key
 === "Atölye betiği"
 
     ```bash
-    python local_python/01_hybrid_train.py --model yolo26n.pt --data coco8.yaml --epochs 10 --device xpu --project gdg-samsun
+    python local_python/01_hybrid_train.py --model yolo26n.pt --data coco8.yaml --epochs 10 --project gdg-samsun
     ```
 
-    Betik önce anahtarınızı doğrular ve kullanıcı adınızı bulur. Ardından `gdg-samsun` adını `username/gdg-samsun` biçimine çevirir. `--device auto` verirseniz en uygun cihazı da kendisi seçer. Anahtarınız yoksa eğitimi çevrimdışı yapar ve anahtarı nereden alabileceğinizi gösterir.
+    Betik önce anahtarınızı doğrular ve kullanıcı adınızı bulur. Ardından `gdg-samsun` adını `username/gdg-samsun` biçimine çevirir. En uygun cihazı (NVIDIA CUDA, Intel XPU, Apple MPS ya da CPU) da kendisi seçer. Anahtarınız yoksa eğitimi çevrimdışı yapar ve anahtarı nereden alabileceğinizi gösterir.
 
 === "Python"
 
@@ -186,13 +166,15 @@ export ULTRALYTICS_API_KEY=ul_your_api_key
     from ultralytics import YOLO
 
     model = YOLO("yolo26n.pt")
-    model.train(data="coco8.yaml", epochs=10, device="xpu", project="your_username/gdg-samsun", name="laptop-run")
+    # device: NVIDIA CUDA için 0, Intel GPU için "xpu", Apple silicon için "mps", her bilgisayarda "cpu"
+    model.train(data="coco8.yaml", epochs=10, device=0, project="your_username/gdg-samsun", name="laptop-run")
     ```
 
 === "CLI"
 
     ```bash
-    yolo train model=yolo26n.pt data=coco8.yaml epochs=10 device=xpu project=your_username/gdg-samsun name=laptop-run
+    # NVIDIA CUDA için device=0, Intel GPU için device=xpu, Apple silicon için device=mps, her bilgisayarda device=cpu
+    yolo train model=yolo26n.pt data=coco8.yaml epochs=10 device=0 project=your_username/gdg-samsun name=laptop-run
     ```
 
 === "Platform veri seti"
@@ -201,12 +183,12 @@ export ULTRALYTICS_API_KEY=ul_your_api_key
     yolo train model=yolo26n.pt data=ul://your_username/datasets/your_dataset epochs=50 project=your_username/gdg-samsun
     ```
 
-`yolo26n.pt` modelinin `coco8.yaml` üzerinde on epoch eğitimi, Intel Arc B390 dizüstü GPU'sunda PyTorch XPU ile yalnızca **18 saniye** sürdü ve **0.941 mAP50** değerine ulaştı.
+`yolo26n.pt` modelinin `coco8.yaml` üzerinde on epoch eğitimi, bir dizüstü bilgisayar GPU'sunda yaklaşık **18 saniye** sürdü ve **0.941 mAP50** değerine ulaştı.
 
 <div class="gallery" markdown>
 <figure markdown>
 ![Eğitim grafikleri](assets/results/training_results.png)
-<figcaption>XPU eğitimine ait kayıp ve mAP grafikleri</figcaption>
+<figcaption>Eğitim boyunca kayıp ve mAP grafikleri</figcaption>
 </figure>
 <figure markdown>
 ![Eğitim mozaiği](assets/results/train_batch0.jpg)
@@ -236,10 +218,20 @@ python local_python/08_platform_tour.py predict --model your_username/gdg-samsun
 
 ## Deneme alanı: Ultralytics YOLO ile neler yapılabilir :art:
 
+[![Ultralytics CI](https://github.com/ultralytics/ultralytics/actions/workflows/ci.yml/badge.svg)](https://github.com/ultralytics/ultralytics/actions/workflows/ci.yml)
+[![PyPI Version](https://img.shields.io/pypi/v/ultralytics?logo=pypi&logoColor=white)](https://pypi.org/project/ultralytics/)
+[![Ultralytics Downloads](https://static.pepy.tech/badge/ultralytics)](https://clickpy.clickhouse.com/dashboard/ultralytics)
+[![Python Version](https://img.shields.io/pypi/pyversions/ultralytics?logo=python&logoColor=gold)](https://pypi.org/project/ultralytics/)
+[![Ultralytics Discord](https://img.shields.io/discord/1089800235347353640?logo=discord&logoColor=white&label=Discord&color=blue)](https://discord.com/invite/ultralytics)
+[![Ultralytics Forums](https://img.shields.io/discourse/users?server=https%3A%2F%2Fcommunity.ultralytics.com&logo=discourse&label=Forums&color=blue)](https://community.ultralytics.com)
+[![Ultralytics Reddit](https://img.shields.io/reddit/subreddit-subscribers/ultralytics?style=flat&logo=reddit&logoColor=white&label=Reddit&color=blue)](https://www.reddit.com/r/ultralytics/)
+[![Open Ultralytics In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ultralytics/ultralytics/blob/main/examples/tutorial.ipynb)
+[![Open Ultralytics In Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://www.kaggle.com/models/ultralytics/yolo26)
+
 ### Yedi görev, tek API
 
 ```bash
-python local_python/03_all_tasks.py --device xpu
+python local_python/03_all_tasks.py
 ```
 
 ```python
@@ -307,10 +299,12 @@ python local_python/06_solutions.py --solution speed     # hız tahmini yapar
 
 ### Otomatik etiketleme
 
-Elle etiketleme çok zaman alır. Ultralytics YOLO nesneleri bulur, SAM maskeleri çizer ve YOLO segmentasyon etiketleri kendiliğinden hazırlanır. Bu etiketleri kontrol etmek için Ultralytics Platform'a yükleyebilir ya da Platform'daki **Smart Annotation** özelliğini SAM 3.1 ile doğrudan tarayıcıda kullanabilirsiniz.
+Elle etiketleme çok zaman alır. Kendi bilgisayarınızda Ultralytics YOLO nesneleri bulur, SAM maskeleri çizer ve YOLO segmentasyon etiketleri kendiliğinden hazırlanır.
+
+Ultralytics Platform ise tarayıcıdaki **Smart Annotation** özelliğiyle bir adım daha ileri gider. Nesnelere SAM 3.1 ile tıklayarak etiketleyebilir, hazır ya da kendi eğittiğiniz Ultralytics YOLO modellerini çalıştırabilir veya sınıf adlarını yazıp tüm veri setini bir görsel dil modeline etiketletebilirsiniz. Platform'da barındırılan sekiz açık kaynak modelden birini (varsayılan olarak Moondream 3.1) seçebilir ya da kendi sağlayıcı anahtarınızı ekleyerek OpenAI, Anthropic, Google ve diğer sağlayıcıların görsel modellerini kullanabilirsiniz.
 
 ```bash
-python local_python/07_auto_annotate.py --device xpu
+python local_python/07_auto_annotate.py
 python local_python/07_auto_annotate.py --images path/to/your/images --classes 0 2
 ```
 
@@ -330,9 +324,9 @@ python local_python/07_auto_annotate.py --images path/to/your/images --classes 0
 Atölyenin en sevilen bölümü burası. Kamerayı salona çevirin ve çıkarım motorlarını canlı olarak değiştirin.
 
 ```bash
-python local_python/05_webcam.py                                              # CPU üzerinde PyTorch
+python local_python/05_webcam.py                                              # bu bilgisayardaki en uygun cihaz
 python local_python/05_webcam.py --model yolo26n_openvino_model --device intel:gpu
-python local_python/05_webcam.py --model yolo26n-pose.pt --device xpu --track
+python local_python/05_webcam.py --model yolo26n-pose.pt --track
 ```
 
 ## Adım 2: Dışa aktarma ve büyük hız yarışı :package:
@@ -369,13 +363,24 @@ YOLO("yolo26n_openvino_model").predict("bus.jpg", device="intel:npu")  # evet, N
 
 !!! success "Öne çıkanlar"
 
-    Dahili Arc GPU üzerinde çalışan OpenVINO, CPU üzerindeki PyTorch'tan **7.8 kat daha hızlı**. NPU ise çok az enerji harcarken PyTorch XPU ile aynı hıza ulaşıyor. Bu yüzden sürekli açık kalan kameralar için ideal bir seçenek. Model ve doğruluk aynı kaldığı için tüm formatlar aynı kutuları buluyor.
+    Dahili Arc GPU üzerinde çalışan OpenVINO, CPU üzerindeki PyTorch'tan **7.8 kat daha hızlı**. NPU ise çok az enerji harcarken dizüstü GPU'sundaki PyTorch ile aynı hıza ulaşıyor. Bu yüzden sürekli açık kalan kameralar için ideal bir seçenek. Model ve doğruluk aynı kaldığı için tüm formatlar aynı kutuları buluyor.
 
 !!! info "NVIDIA GPU'nuz varsa"
 
     `--tensorrt` parametresini eklediğinizde tabloya bir TensorRT FP16 satırı da eklenir. Colab'da T4 çalışma ortamını seçerseniz notebook bu adımı sizin için yapar.
 
 ## Adım 3: Ultralytics Inference ile yüksek hızda çalıştırma :crab:
+
+[![Crates.io](https://img.shields.io/crates/v/ultralytics-inference?logo=rust&logoColor=white&label=crates.io&color=CE422B)](https://crates.io/crates/ultralytics-inference)
+[![docs.rs](https://img.shields.io/docsrs/ultralytics-inference?logo=docs.rs&logoColor=white&label=docs.rs&color=CE422B)](https://docs.rs/ultralytics-inference)
+[![Downloads](https://img.shields.io/crates/d/ultralytics-inference?logo=rust&logoColor=white&label=downloads&color=CE422B)](https://crates.io/crates/ultralytics-inference)
+[![MSRV](https://img.shields.io/crates/msrv/ultralytics-inference?logo=rust&logoColor=white&color=CE422B)](https://crates.io/crates/ultralytics-inference)
+[![CI](https://github.com/ultralytics/inference/actions/workflows/ci.yml/badge.svg)](https://github.com/ultralytics/inference/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/github/ultralytics/inference/branch/main/graph/badge.svg)](https://app.codecov.io/github/ultralytics/inference)
+[![License](https://img.shields.io/crates/l/ultralytics-inference?label=license&color=blue)](https://github.com/ultralytics/inference/blob/main/LICENSE)
+[![dependency status](https://deps.rs/repo/github/ultralytics/inference/status.svg)](https://deps.rs/repo/github/ultralytics/inference)
+[![arXiv](https://img.shields.io/badge/arXiv-2606.03748-b31b1b?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2606.03748)
+[![Ultralytics Discord](https://img.shields.io/discord/1089800235347353640?logo=discord&logoColor=white&label=Discord&color=blue)](https://discord.com/invite/ultralytics)
 
 Ultralytics Inference, Ultralytics YOLO için geliştirilmiş bir Rust kütüphanesi ve CLI aracıdır. ONNX ve OpenVINO formatındaki modelleri okur, yedi görevin tamamını destekler ve CPU, CUDA, TensorRT, CoreML, OpenVINO gibi pek çok altyapıda çalışır. Tek ve küçük bir uygulama dosyasıdır, çalışırken Python gerektirmez.
 
@@ -498,7 +503,7 @@ Aynı bilgisayar ve aynı `yolo26n` modelleri kullanıldı. Her ölçüm 300 kez
 
 !!! success "Öne çıkanlar"
 
-    Rust uygulaması yalnızca **37 MB** boyutunda ve Python ortamına ihtiyaç duymuyor. Karşılaştırma için, PyTorch XPU içeren atölye `.venv` klasörü 7.9 GB yer kaplıyor. Uçtan uca ölçümlerde Rust, Python'u GPU, NPU ve ONNX Runtime üzerinde geride bırakıyor. CPU'da ise thread sayısı ayarlandığında Python ile aynı seviyeye geliyor. Videoyu **1.4 kat daha hızlı** işliyor ve **3.3 kat daha az bellek** kullanıyor. CPU üzerindeki ONNX Runtime süresi Python'da 83.6 ms iken Rust'ta 16.3 ms'ye düşüyor.
+    Rust uygulaması yalnızca **37 MB** boyutunda ve Python ortamına ihtiyaç duymuyor. Karşılaştırma için, atölyenin Python `.venv` klasörü 7.9 GB yer kaplıyor. Uçtan uca ölçümlerde Rust, Python'u GPU, NPU ve ONNX Runtime üzerinde geride bırakıyor. CPU'da ise thread sayısı ayarlandığında Python ile aynı seviyeye geliyor. Videoyu **1.4 kat daha hızlı** işliyor ve **3.3 kat daha az bellek** kullanıyor. CPU üzerindeki ONNX Runtime süresi Python'da 83.6 ms iken Rust'ta 16.3 ms'ye düşüyor.
 
 !!! tip "Hibrit işlemcilerde CPU thread sayısı"
 
@@ -518,7 +523,7 @@ Aynı bilgisayar ve aynı `yolo26n` modelleri kullanıldı. Her ölçüm 300 kez
 
     Yeni dizüstü bilgisayarların çoğu kamerayı bir Intel IPU ve v4l2loopback cihazı üzerinden sunar. `v4l2-ctl --list-devices` komutuyla cihazları listeleyin ve loopback cihazının numarasını kullanın. Örneğin Python için `--camera 50`, `run_cli.sh` için `CAMERA=50` yazabilirsiniz.
 
-??? question "OpenVINO cihaz listesinde intel:gpu ya da intel:npu görünmüyor"
+??? question "OpenVINO intel:gpu ya da intel:npu cihazını listelemiyor"
 
     `python -c "import openvino as ov; print(ov.Core().available_devices)"` komutunu çalıştırın. Listede GPU ya da NPU yoksa dağıtımınız için Intel GPU compute runtime paketini ve NPU sürücüsünü kurun, ardından bilgisayarı yeniden başlatın.
 
@@ -526,9 +531,9 @@ Aynı bilgisayar ve aynı `yolo26n` modelleri kullanıldı. Her ölçüm 300 kez
 
     Adım 3.1'de gösterildiği gibi `LD_LIBRARY_PATH` değişkenini `openvino` pip paketinin `libs` klasörüne yönlendirin. `run_cli.sh` bu ayarı sizin için otomatik yapar.
 
-??? question "PyTorch XPU kullanılamıyor"
+??? question "PyTorch GPU'mu görmüyor"
 
-    PyTorch'u `https://download.pytorch.org/whl/xpu` adresinden kurduğunuzdan ve Intel GPU sürücünüzün güncel olduğundan emin olun. `python local_python/00_check_env.py` komutu PyTorch'un hangi cihazları gördüğünü gösterir.
+    PyTorch'un neleri gördüğünü öğrenmek için `python local_python/00_check_env.py` komutunu çalıştırın. NVIDIA kartlar için `./setup_env.sh cuda` ile kurulan CUDA sürümü ve güncel bir sürücü gerekir. Intel GPU'lar için `./setup_env.sh` ile kurulan XPU sürümü ve güncel bir Intel GPU sürücüsü gerekir. Apple silicon ise `./setup_env.sh cpu` ile kurulan sürümde MPS üzerinden çalışır.
 
 ??? question "Eğitim Ultralytics Platform'da görünmüyor"
 
@@ -538,7 +543,7 @@ Aynı bilgisayar ve aynı `yolo26n` modelleri kullanıldı. Her ölçüm 300 kez
 
 | Yol | Açıklama |
 |---|---|
-| `setup_env.sh` | PyTorch XPU, CUDA ya da CPU ile OpenVINO içeren `.venv` ortamını kurar |
+| `setup_env.sh` | CUDA, Intel XPU ya da CPU için PyTorch ile OpenVINO içeren `.venv` ortamını kurar |
 | `local_python/00_check_env.py` | Tüm hızlandırıcılar için ön koşul kontrolü yapar |
 | `local_python/01_hybrid_train.py` | Ultralytics Platform girişi ve hibrit eğitimi yürütür |
 | `local_python/02_export_model.py` | ONNX, OpenVINO ve TensorRT dışa aktarımı ile hız yarışını yapar |
@@ -548,6 +553,7 @@ Aynı bilgisayar ve aynı `yolo26n` modelleri kullanıldı. Her ölçüm 300 kez
 | `local_python/06_solutions.py` | Sayma, ısı haritası, gizlilik bulanıklaştırma ve hız tahmini yapar |
 | `local_python/07_auto_annotate.py` | Ultralytics YOLO ve SAM ile otomatik etiketleme yapar |
 | `local_python/08_platform_tour.py` | Ultralytics Platform Python istemcisini tanıtır |
+| `local_python/device_utils.py` | NVIDIA CUDA, Intel XPU, Apple MPS ve CPU arasından en uygun cihazı seçer |
 | `local_inference/` | `ultralytics-inference` için Rust Cargo projesi ve `run_cli.sh` betiği |
 | `notebooks/hybrid_yolo_workshop.ipynb` | Atölyenin tamamını Google Colab üzerinde sunar |
 | `tools/` | Notebook üretici ve yazım stili kontrol aracı |

@@ -110,7 +110,14 @@ import torch
 
 from ultralytics import YOLO
 
-DEVICE = "0" if torch.cuda.is_available() else "xpu" if hasattr(torch, "xpu") and torch.xpu.is_available() else "cpu"
+if torch.cuda.is_available():
+    DEVICE = "0"  # NVIDIA CUDA, the Colab T4 lands here
+elif hasattr(torch, "xpu") and torch.xpu.is_available():
+    DEVICE = "xpu"  # Intel GPU
+elif torch.backends.mps.is_available():
+    DEVICE = "mps"  # Apple silicon
+else:
+    DEVICE = "cpu"
 PROJECT = f"{USERNAME}/gdg-samsun" if USERNAME else "gdg-samsun"
 print(f"Training on {DEVICE}, project {PROJECT}")
 
@@ -190,7 +197,7 @@ display(Image(filename="showcase/heatmap.jpg", width=640))
 md("""
 ## 5. Automatic annotation ✍️
 
-Ultralytics YOLO finds the objects, SAM draws the masks, and you get YOLO segmentation labels without clicking a single polygon. The Ultralytics Platform has the same idea built in as **Smart Annotation**.
+Ultralytics YOLO finds the objects, SAM draws the masks, and you get YOLO segmentation labels without clicking a single polygon. The Ultralytics Platform goes further with **Smart Annotation** in the browser: SAM 3.1 clicks, pretrained or your own Ultralytics YOLO models, and vision language models that label a whole dataset from class names, either hosted open source models (Moondream 3.1 by default) or API models from OpenAI, Anthropic, Google and more with your own provider key.
 """)
 code("""
 from ultralytics.data.annotator import auto_annotate

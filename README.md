@@ -21,7 +21,7 @@ You do not need a giant GPU to do serious computer vision. In this GDG Samsun De
 
 | Step | You will | Files |
 |---|---|---|
-| 0 Setup | Build a `.venv` with PyTorch XPU, CUDA or CPU plus OpenVINO and check every accelerator | `setup_env.sh`, `local_python/00_check_env.py` |
+| 0 Setup | Build a `.venv` with the right PyTorch for your hardware plus OpenVINO and check every accelerator | `setup_env.sh`, `local_python/00_check_env.py` |
 | 1 Train | Log in to the Ultralytics Platform and train `yolo26n.pt` locally with live cloud metrics | `local_python/01_hybrid_train.py` |
 | Playground | Seven tasks, tracking, webcam, Solutions, auto annotation and the Platform API | `local_python/03` to `08` |
 | 2 Export | Export to ONNX, OpenVINO and TensorRT and race every format on every device | `local_python/02_export_model.py` |
@@ -47,7 +47,7 @@ The full guide with pictures lives on the **[workshop page](https://onuralpszr.g
 flowchart TB
     subgraph Data["Data"]
         direction LR
-        A[Your images] --> B[Auto annotation with YOLO and SAM]
+        A[Your images] --> B[Auto annotation with YOLO, SAM or vision language models]
         B --> C[(Ultralytics Platform dataset)]
     end
     subgraph Train["Step 1 Train"]
@@ -84,7 +84,7 @@ git clone https://github.com/onuralpszr/gdg-samsun-etkinlik-2026-workshop.git
 cd gdg-samsun-etkinlik-2026-workshop
 ./setup_env.sh          # Intel GPU and NPU laptops (PyTorch XPU plus OpenVINO)
 ./setup_env.sh cuda     # NVIDIA machines
-./setup_env.sh cpu      # anything else
+./setup_env.sh cpu      # Apple silicon (MPS) and any other machine
 source .venv/bin/activate
 python local_python/00_check_env.py
 ```
@@ -107,23 +107,34 @@ yolo login ul_your_api_key        # or: export ULTRALYTICS_API_KEY=ul_your_api_k
 Train on your own hardware while the Platform shows live metrics. `project="username/project"` is the switch that turns streaming on.
 
 ```bash
-python local_python/01_hybrid_train.py --model yolo26n.pt --data coco8.yaml --epochs 10 --device xpu --project gdg-samsun
+python local_python/01_hybrid_train.py --model yolo26n.pt --data coco8.yaml --epochs 10 --project gdg-samsun   # picks CUDA, Intel XPU, Apple MPS or CPU on its own
 ```
 
 ```python
 from ultralytics import YOLO
 
 model = YOLO("yolo26n.pt")
-model.train(data="coco8.yaml", epochs=10, device="xpu", project="your_username/gdg-samsun", name="laptop-run")
+# device: 0 for NVIDIA CUDA, "xpu" for Intel GPU, "mps" for Apple silicon, "cpu" for any machine
+model.train(data="coco8.yaml", epochs=10, device=0, project="your_username/gdg-samsun", name="laptop-run")
 ```
 
 Want a cloud GPU instead? Open your project on the Platform, click **New Model**, pick `YOLO26n` and a dataset, choose a GPU and press **Start Training**. Datasets on the Platform train locally too with `data=ul://your_username/datasets/your_dataset`.
 
-Ten epochs on `coco8.yaml` take **18 seconds** on the Intel Arc B390 laptop GPU with PyTorch XPU and reach **mAP50 0.941**.
+Ten epochs on `coco8.yaml` take about **18 seconds** on a laptop GPU and reach **mAP50 0.941**.
 
 <img src="docs/assets/results/training_results.png" alt="Training curves" width="100%">
 
 ## Playground
+
+[![Ultralytics CI](https://github.com/ultralytics/ultralytics/actions/workflows/ci.yml/badge.svg)](https://github.com/ultralytics/ultralytics/actions/workflows/ci.yml)
+[![PyPI Version](https://img.shields.io/pypi/v/ultralytics?logo=pypi&logoColor=white)](https://pypi.org/project/ultralytics/)
+[![Ultralytics Downloads](https://static.pepy.tech/badge/ultralytics)](https://clickpy.clickhouse.com/dashboard/ultralytics)
+[![Python Version](https://img.shields.io/pypi/pyversions/ultralytics?logo=python&logoColor=gold)](https://pypi.org/project/ultralytics/)
+[![Ultralytics Discord](https://img.shields.io/discord/1089800235347353640?logo=discord&logoColor=white&label=Discord&color=blue)](https://discord.com/invite/ultralytics)
+[![Ultralytics Forums](https://img.shields.io/discourse/users?server=https%3A%2F%2Fcommunity.ultralytics.com&logo=discourse&label=Forums&color=blue)](https://community.ultralytics.com)
+[![Ultralytics Reddit](https://img.shields.io/reddit/subreddit-subscribers/ultralytics?style=flat&logo=reddit&logoColor=white&label=Reddit&color=blue)](https://www.reddit.com/r/ultralytics/)
+[![Open Ultralytics In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ultralytics/ultralytics/blob/main/examples/tutorial.ipynb)
+[![Open Ultralytics In Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://www.kaggle.com/models/ultralytics/yolo26)
 
 | Script | What it does |
 |---|---|
@@ -131,7 +142,7 @@ Ten epochs on `coco8.yaml` take **18 seconds** on the Intel Arc B390 laptop GPU 
 | `04_track.py` | multi object tracking with six trackers on video or webcam |
 | `05_webcam.py` | live webcam with an FPS counter, swap engines on the fly |
 | `06_solutions.py` | counting, heatmap, privacy blur and speed estimation |
-| `07_auto_annotate.py` | YOLO segmentation labels for free with Ultralytics YOLO plus SAM |
+| `07_auto_annotate.py` | YOLO segmentation labels for free with Ultralytics YOLO plus SAM, and the Platform adds Smart Annotation with SAM, YOLO and vision language models |
 | `08_platform_tour.py` | GPU availability, account, projects and remote predict on the Ultralytics Platform |
 
 <table>
@@ -170,6 +181,17 @@ Intel Core Ultra X7 358H with Arc B390 graphics and the built in NPU, `yolo26n.p
 | OpenVINO | intel:npu | 10.1 | 3.2 | 4.7 | 316 | 4.6x | 5 |
 
 ## Step 3: High speed execution with Ultralytics Inference
+
+[![Crates.io](https://img.shields.io/crates/v/ultralytics-inference?logo=rust&logoColor=white&label=crates.io&color=CE422B)](https://crates.io/crates/ultralytics-inference)
+[![docs.rs](https://img.shields.io/docsrs/ultralytics-inference?logo=docs.rs&logoColor=white&label=docs.rs&color=CE422B)](https://docs.rs/ultralytics-inference)
+[![Downloads](https://img.shields.io/crates/d/ultralytics-inference?logo=rust&logoColor=white&label=downloads&color=CE422B)](https://crates.io/crates/ultralytics-inference)
+[![MSRV](https://img.shields.io/crates/msrv/ultralytics-inference?logo=rust&logoColor=white&color=CE422B)](https://crates.io/crates/ultralytics-inference)
+[![CI](https://github.com/ultralytics/inference/actions/workflows/ci.yml/badge.svg)](https://github.com/ultralytics/inference/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/github/ultralytics/inference/branch/main/graph/badge.svg)](https://app.codecov.io/github/ultralytics/inference)
+[![License](https://img.shields.io/crates/l/ultralytics-inference?label=license&color=blue)](https://github.com/ultralytics/inference/blob/main/LICENSE)
+[![dependency status](https://deps.rs/repo/github/ultralytics/inference/status.svg)](https://deps.rs/repo/github/ultralytics/inference)
+[![arXiv](https://img.shields.io/badge/arXiv-2606.03748-b31b1b?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2606.03748)
+[![Ultralytics Discord](https://img.shields.io/discord/1089800235347353640?logo=discord&logoColor=white&label=Discord&color=blue)](https://discord.com/invite/ultralytics)
 
 ```bash
 cargo install ultralytics-inference --features "openvino-native,video"
@@ -225,7 +247,7 @@ The Rust binary is 37 MB with no Python at runtime. It runs video 1.4x faster wi
 
 | Path | What it is |
 |---|---|
-| `setup_env.sh` | Builds `.venv` with PyTorch XPU, CUDA or CPU plus OpenVINO |
+| `setup_env.sh` | Builds `.venv` with PyTorch for CUDA, Intel XPU or CPU plus OpenVINO |
 | `requirements.txt` | Workshop Python packages |
 | `local_python/00_check_env.py` | Prerequisites check for every accelerator |
 | `local_python/01_hybrid_train.py` | Ultralytics Platform login and hybrid training |
@@ -236,6 +258,7 @@ The Rust binary is 37 MB with no Python at runtime. It runs video 1.4x faster wi
 | `local_python/06_solutions.py` | Counting, heatmap, privacy blur and speed estimation |
 | `local_python/07_auto_annotate.py` | Auto annotation with Ultralytics YOLO and SAM |
 | `local_python/08_platform_tour.py` | Ultralytics Platform Python client tour |
+| `local_python/device_utils.py` | Shared device picker for NVIDIA CUDA, Intel XPU, Apple MPS and CPU |
 | `local_inference/Cargo.toml` and `src/main.rs` | Rust app on the `ultralytics-inference` crate |
 | `local_inference/run_cli.sh` | `ultralytics-inference` CLI tour |
 | `notebooks/hybrid_yolo_workshop.ipynb` | The whole workshop in Google Colab |

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="120" viewBox="0 0 520 120" role="img" aria-label="GDG Samsun DevFest 2026">
+  <g stroke-linecap="round" stroke-width="14" fill="none">
+    <path d="M52 30 L20 60" stroke="#EA4335"/>
+    <path d="M20 60 L52 90" stroke="#4285F4"/>
+    <path d="M98 30 L130 60" stroke="#34A853"/>
+    <path d="M130 60 L98 90" stroke="#FBBC04"/>
+  </g>
+  <text x="160" y="62" font-family="'Google Sans', 'Product Sans', Roboto, Arial, sans-serif" font-size="44" font-weight="700" fill="#FFFFFF">GDG Samsun</text>
+  <text x="162" y="98" font-family="'Google Sans', 'Product Sans', Roboto, Arial, sans-serif" font-size="26" font-weight="500">
+    <tspan fill="#4285F4">Dev</tspan><tspan fill="#EA4335">Fest</tspan><tspan fill="#FBBC04"> 20</tspan><tspan fill="#34A853">26</tspan>
+  </text>
+</svg>

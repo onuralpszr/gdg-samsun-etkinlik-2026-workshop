@@ -1,0 +1,2 @@
+# Packages needed to build the workshop page
+mkdocs-material>=9.6

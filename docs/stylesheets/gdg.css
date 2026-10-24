@@ -1,0 +1,195 @@
+/* GDG DevFest colors for the No GPU Left Behind workshop page */
+:root {
+  --gdg-blue: #4285f4;
+  --gdg-red: #ea4335;
+  --gdg-yellow: #fbbc04;
+  --gdg-green: #34a853;
+  --gdg-ink: #202124;
+  --gdg-paper: #f8f9fa;
+  --ultra-blue: #042aff;
+  --md-primary-fg-color: var(--gdg-blue);
+  --md-primary-fg-color--light: #8ab4f8;
+  --md-primary-fg-color--dark: #1a73e8;
+  --md-accent-fg-color: var(--gdg-green);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #17181b;
+  --md-primary-fg-color: #1a73e8;
+  --md-typeset-a-color: #8ab4f8;
+}
+
+/* Four color stripe under the header, the DevFest signature */
+.md-header {
+  box-shadow: none;
+}
+
+.md-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--gdg-blue) 0 25%,
+    var(--gdg-red) 25% 50%,
+    var(--gdg-yellow) 50% 75%,
+    var(--gdg-green) 75% 100%
+  );
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 1.5rem 1rem 2rem;
+  margin: 0 0 1.5rem;
+  border-radius: 24px;
+  background: radial-gradient(circle at 10% 10%, rgba(66, 133, 244, 0.16), transparent 40%),
+    radial-gradient(circle at 90% 20%, rgba(234, 67, 53, 0.14), transparent 40%),
+    radial-gradient(circle at 20% 90%, rgba(251, 188, 4, 0.16), transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(52, 168, 83, 0.16), transparent 40%);
+}
+
+.hero .logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.hero .logos img {
+  height: 54px;
+  width: auto;
+}
+
+.hero h1 {
+  font-size: 2.6rem;
+  font-weight: 800;
+  margin: 0.3rem 0;
+  line-height: 1.1;
+}
+
+.hero h1 .b { color: var(--gdg-blue); }
+.hero h1 .r { color: var(--gdg-red); }
+.hero h1 .y { color: var(--gdg-yellow); }
+.hero h1 .g { color: var(--gdg-green); }
+
+.hero .tagline {
+  font-size: 1.15rem;
+  opacity: 0.85;
+  margin-bottom: 1.2rem;
+}
+
+.hero .md-button {
+  margin: 0.25rem;
+  border-radius: 999px;
+}
+
+.md-typeset .md-button--primary {
+  background-color: var(--gdg-blue);
+  border-color: var(--gdg-blue);
+}
+
+/* Colored step cards */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+}
+
+.steps .card {
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+  border-top: 6px solid var(--gdg-blue);
+  background: var(--md-code-bg-color);
+}
+
+.steps .card:nth-child(2) { border-top-color: var(--gdg-red); }
+.steps .card:nth-child(3) { border-top-color: var(--gdg-yellow); }
+.steps .card:nth-child(4) { border-top-color: var(--gdg-green); }
+
+.steps .card strong {
+  display: block;
+  font-size: 1.05rem;
+  margin-bottom: 0.3rem;
+}
+
+/* Image galleries */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.8rem;
+}
+
+.gallery figure {
+  margin: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--md-code-bg-color);
+}
+
+.gallery img {
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery figcaption {
+  padding: 0.45rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.wide {
+  text-align: center;
+}
+
+.wide img {
+  border-radius: 14px;
+  width: 100%;
+  max-width: 760px;
+}
+
+/* Agenda timeline */
+.md-typeset table:not([class]) th {
+  background: var(--gdg-blue);
+  color: #ffffff;
+}
+
+.md-typeset table:not([class]) tr:nth-child(4n + 2) td:first-child { border-left: 4px solid var(--gdg-blue); }
+.md-typeset table:not([class]) tr:nth-child(4n + 3) td:first-child { border-left: 4px solid var(--gdg-red); }
+.md-typeset table:not([class]) tr:nth-child(4n + 4) td:first-child { border-left: 4px solid var(--gdg-yellow); }
+.md-typeset table:not([class]) tr:nth-child(4n + 1) td:first-child { border-left: 4px solid var(--gdg-green); }
+
+/* Follow up QR codes */
+.qr {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  text-align: center;
+}
+
+.qr img {
+  width: 180px;
+  height: 180px;
+  background: #ffffff;
+  padding: 8px;
+  border-radius: 12px;
+}
+
+@media screen and (max-width: 600px) {
+  .hero h1 {
+    font-size: 1.9rem;
+  }
+
+  .gallery img {
+    height: 180px;
+  }
+}

@@ -41,15 +41,17 @@ def size_mb(path):
 
 
 def race(weights, device, source, imgsz, runs):
-    """Return the median inference time in ms and the detection count for one format on one device."""
+    """Return median inference ms, median end to end ms and the detection count for one format on one device."""
     model = YOLO(weights, task="detect")
     for _ in range(5):  # warmup lets each backend compile kernels and allocate memory
         model.predict(source, imgsz=imgsz, device=device, verbose=False)
-    times = []
+    times, totals = [], []
     for _ in range(runs):
         result = model.predict(source, imgsz=imgsz, device=device, verbose=False)[0]
         times.append(result.speed["inference"])
-    return statistics.median(times), len(result.boxes) if result.boxes is not None else 0
+        totals.append(sum(result.speed.values()))  # preprocess plus inference plus postprocess
+    count = len(result.boxes) if result.boxes is not None else 0
+    return statistics.median(times), statistics.median(totals), count
 
 
 def openvino_devices():
@@ -92,19 +94,21 @@ def main():
     for fmt, path, device in candidates:
         print(f"Racing {fmt} on {device}")
         try:
-            ms, count = race(path, device, args.source, args.imgsz, args.runs)
+            ms, total, count = race(path, device, args.source, args.imgsz, args.runs)
         except Exception as error:
             print(f"  {fmt} on {device} could not run: {error}")
             continue
-        rows.append({"format": fmt, "device": device, "size": size_mb(path), "ms": ms, "objects": count})
+        rows.append(
+            {"format": fmt, "device": device, "size": size_mb(path), "ms": ms, "total": total, "objects": count}
+        )
 
     baseline = rows[0]["ms"]
-    header = "| Format | Device | Size (MB) | Inference (ms) | FPS | Speedup | Objects |"
-    lines = [header, "|---|---|---:|---:|---:|---:|---:|"]
+    header = "| Format | Device | Size (MB) | Inference (ms) | End to end (ms) | FPS | Speedup | Objects |"
+    lines = [header, "|---|---|---:|---:|---:|---:|---:|---:|"]
     for r in rows:
         lines.append(
-            f"| {r['format']} | {r['device']} | {r['size']:.1f} | {r['ms']:.1f} | {1000 / r['ms']:.0f} "
-            f"| {baseline / r['ms']:.1f}x | {r['objects']} |"
+            f"| {r['format']} | {r['device']} | {r['size']:.1f} | {r['ms']:.1f} | {r['total']:.1f} "
+            f"| {1000 / r['ms']:.0f} | {baseline / r['ms']:.1f}x | {r['objects']} |"
         )
     table = "\n".join(lines)
     print(f"\n{Path(args.weights).name} at imgsz {args.imgsz}, median of {args.runs} runs\n")

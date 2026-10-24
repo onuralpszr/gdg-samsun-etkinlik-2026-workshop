@@ -172,4 +172,4 @@ let mut model = YOLOModel::load_with_config("yolo26n.onnx", config)?;
 
     Intel hibrit işlemcilerde Rust tarafındaki OpenVINO, kullanacağı thread sayısını varsayılan olarak kendisi belirler. Atölye uygulamasına `THREADS=16` (tüm çekirdekler) verirseniz ya da kodda `.with_threads(16)` kullanırsanız CPU üzerindeki çıkarım hızlanır.
 
-[:material-arrow-right: Sonraki: Kapanış](wrap-up.md){ .md-button .md-button--primary .next-step }
+[:material-arrow-right: Sonraki: İleri seviye](advanced.md){ .md-button .md-button--primary .next-step }

@@ -172,4 +172,4 @@ let mut model = YOLOModel::load_with_config("yolo26n.onnx", config)?;
 
     On Intel hybrid CPUs, OpenVINO in Rust picks its own thread count by default. Pass `THREADS=16` (all cores) to the workshop app or call `.with_threads(16)` and the CPU path gets faster.
 
-[:material-arrow-right: Next: Wrap up](wrap-up.md){ .md-button .md-button--primary .next-step }
+[:material-arrow-right: Next: Advanced](advanced.md){ .md-button .md-button--primary .next-step }

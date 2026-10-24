@@ -248,3 +248,8 @@
   justify-content: center;
   margin: 0;
 }
+
+/* A lone last card fills its row */
+.steps .card:last-child:nth-child(3n + 1) {
+  grid-column: 1 / -1;
+}

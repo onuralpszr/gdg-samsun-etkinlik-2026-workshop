@@ -50,6 +50,10 @@ Export to ONNX, OpenVINO and TensorRT, then race every format on every device yo
 Run the same model from the `ultralytics-inference` CLI and Rust crate with flat memory and no Python at all.
 </div>
 <div class="card" markdown>
+<strong>[:rocket: Advanced](advanced.md)</strong>
+Export to INT8 for a smaller and faster model, then run every chip in your laptop at the same time.
+</div>
+<div class="card" markdown>
 <strong>[:tada: Wrap up](wrap-up.md)</strong>
 Mini challenges, troubleshooting tips and the links to keep going after today.
 </div>
@@ -62,9 +66,10 @@ Mini challenges, troubleshooting tips and the links to keep going after today.
 | Time | Block | What happens |
 |---|---|---|
 | 00:00 | Warm up | Who has a GPU? Who has an NPU? Hands up, nobody gets left behind |
-| 00:05 | [Step 0](setup.md) | Run the prerequisites check and log in to the Ultralytics Platform |
-| 00:12 | [Step 1](train.md) | Hybrid training on your laptop with live Platform metrics, plus a cloud training tour |
-| 00:25 | [Playground](playground.md) | Seven tasks, tracking, Solutions and auto annotation in a few lines each |
-| 00:35 | [Step 2](export.md) | Export to ONNX, OpenVINO and TensorRT and run the great speed race |
-| 00:45 | [Step 3](rust.md) | Ultralytics Inference in Rust, the CLI, batch, video and webcam |
+| 00:03 | [Step 0](setup.md) | Check the setup you installed at home and log in to the Ultralytics Platform |
+| 00:07 | [Step 1](train.md) | Hybrid training on your laptop with live Platform metrics, plus a cloud training tour |
+| 00:20 | [Playground](playground.md) | Seven tasks, tracking, Solutions and auto annotation in a few lines each |
+| 00:30 | [Step 2](export.md) | Export to ONNX, OpenVINO and TensorRT and run the great speed race |
+| 00:38 | [Step 3](rust.md) | Ultralytics Inference in Rust, the CLI, batch, video and webcam |
+| 00:48 | [Advanced](advanced.md) | INT8 export and every chip at once |
 | 00:55 | [Wrap up](wrap-up.md) | Live webcam showdown, follow up links and questions |

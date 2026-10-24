@@ -62,6 +62,7 @@ plugins:
             Playground: Deneme alanı
             Step 2 Export: Adım 2 Dışa aktarma
             Step 3 Rust: Adım 3 Rust
+            Advanced: İleri seviye
             Wrap up: Kapanış
 
 extra_css:
@@ -104,6 +105,7 @@ nav:
   - Playground: playground.md
   - Step 2 Export: export.md
   - Step 3 Rust: rust.md
+  - Advanced: advanced.md
   - Wrap up: wrap-up.md
 
 validation:

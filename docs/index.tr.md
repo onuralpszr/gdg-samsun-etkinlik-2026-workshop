@@ -50,6 +50,10 @@ Modeli ONNX, OpenVINO ve TensorRT formatlarına aktarın ve her formatı sahip o
 Aynı modeli `ultralytics-inference` CLI aracı ve Rust kütüphanesi ile çalıştırın. Bellek kullanımı sabit kalır ve Python'a hiç gerek kalmaz.
 </div>
 <div class="card" markdown>
+<strong>[:rocket: İleri seviye](advanced.md)</strong>
+Modeli INT8 olarak dışa aktarıp küçültün ve hızlandırın, ardından bilgisayarınızdaki bütün çipleri aynı anda çalıştırın.
+</div>
+<div class="card" markdown>
 <strong>[:tada: Kapanış](wrap-up.md)</strong>
 Mini görevler, sorun giderme ipuçları ve bugünden sonra devam etmek için bağlantılar.
 </div>
@@ -62,9 +66,10 @@ Mini görevler, sorun giderme ipuçları ve bugünden sonra devam etmek için ba
 | Zaman | Bölüm | İçerik |
 |---|---|---|
 | 00:00 | Isınma | Kimde GPU var, kimde NPU var? Herkes katılıyor, kimse geride kalmıyor. |
-| 00:05 | [Adım 0](setup.md) | Ön koşul kontrolünü çalıştırıp Ultralytics Platform'a giriş yapıyoruz. |
-| 00:12 | [Adım 1](train.md) | Dizüstü bilgisayarda hibrit eğitim yapıyor, metrikleri Platform'da canlı izliyor ve bulut eğitimini tanıyoruz. |
-| 00:25 | [Deneme alanı](playground.md) | Yedi görev, nesne takibi, Solutions ve otomatik etiketlemeyi birkaç satır kodla deniyoruz. |
-| 00:35 | [Adım 2](export.md) | Modeli ONNX, OpenVINO ve TensorRT formatlarına aktarıp büyük hız yarışını başlatıyoruz. |
-| 00:45 | [Adım 3](rust.md) | Rust ile Ultralytics Inference, CLI, toplu işleme, video ve webcam kullanımını görüyoruz. |
+| 00:03 | [Adım 0](setup.md) | Evde kurduğunuz ortamı kontrol edip Ultralytics Platform'a giriş yapıyoruz. |
+| 00:07 | [Adım 1](train.md) | Dizüstü bilgisayarda hibrit eğitim yapıyor, metrikleri Platform'da canlı izliyor ve bulut eğitimini tanıyoruz. |
+| 00:20 | [Deneme alanı](playground.md) | Yedi görev, nesne takibi, Solutions ve otomatik etiketlemeyi birkaç satır kodla deniyoruz. |
+| 00:30 | [Adım 2](export.md) | Modeli ONNX, OpenVINO ve TensorRT formatlarına aktarıp büyük hız yarışını başlatıyoruz. |
+| 00:38 | [Adım 3](rust.md) | Rust ile Ultralytics Inference, CLI, toplu işleme, video ve webcam kullanımını görüyoruz. |
+| 00:48 | [İleri seviye](advanced.md) | INT8 dışa aktarma yapıyor ve bütün çipleri aynı anda çalıştırıyoruz. |
 | 00:55 | [Kapanış](wrap-up.md) | Canlı webcam gösterisi, faydalı bağlantılar ve soru cevap ile bitiriyoruz. |

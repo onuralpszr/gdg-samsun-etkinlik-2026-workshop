@@ -4,6 +4,17 @@ title: "Adım 0: Ön koşul kontrolü"
 
 # Adım 0: Ön koşul kontrolü :white_check_mark:
 
+!!! warning "Atölyeden önce evde yapın"
+
+    PyTorch indirmesi birkaç GB tutar ve Rust CLI aracı kaynak koddan derlenir. Bu yüzden ikisi de etkinlik alanındaki internetle birkaç dakikada bitmez. Atölyede yalnızca kontrolü çalıştırırsınız.
+
+    - [ ] Python 3.11 ya da üzeri (Ultralytics Platform entegrasyonu için gerekli)
+    - [ ] Depoyu klonlayın ve aşağıda gösterildiği gibi bilgisayarınıza uygun `./setup_env.sh` komutunu çalıştırın
+    - [ ] Bir Ultralytics Platform hesabı ve API anahtarı
+    - [ ] Rust 1.92 ya da üzeri (`curl https://sh.rustup.rs -sSf | sh`)
+    - [ ] [Adım 3](rust.md#31-cli-arac) bölümündeki özelliklerle `cargo install ultralytics-inference`
+    - [ ] Rust ile video ve webcam kullanacaksanız FFmpeg geliştirme kütüphaneleri
+
 === "Linux ve macOS"
 
     ```bash
@@ -41,13 +52,5 @@ title: "Adım 0: Ön koşul kontrolü"
     [Atölye notebook'unu Colab'da açın](https://colab.research.google.com/github/onuralpszr/gdg-samsun-etkinlik-2026-workshop/blob/main/notebooks/hybrid_yolo_workshop.ipynb) ve **Runtime > Change runtime type > T4 GPU** seçeneğini seçin. Bu yolda bilgisayarınıza hiçbir şey kurmanız gerekmez.
 
 `setup_env.sh` en sonda `local_python/00_check_env.py` betiğini çalıştırır. Bu kısa kontrol PyTorch cihazınızı, OpenVINO cihazlarını, Rust CLI aracını ve Ultralytics Platform anahtarınızı gösterir. Ayrıntılı sistem raporu için `yolo checks` komutunu çalıştırabilirsiniz.
-
-!!! tip "Başlamadan önce kontrol listesi"
-
-    - [x] Python 3.11 ya da üzeri (Ultralytics Platform entegrasyonu için gerekli)
-    - [x] `ultralytics` 8.4.120 ya da üzeri
-    - [x] Bir Ultralytics Platform hesabı ve API anahtarı
-    - [x] Adım 3 için Rust 1.92 ya da üzeri (`curl https://sh.rustup.rs -sSf | sh`)
-    - [x] Rust ile video ve webcam kullanacaksanız FFmpeg geliştirme kütüphaneleri
 
 [:material-arrow-right: Sonraki: Adım 1 Eğitim](train.md){ .md-button .md-button--primary .next-step }

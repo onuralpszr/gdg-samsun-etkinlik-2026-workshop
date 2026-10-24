@@ -28,6 +28,7 @@ You do not need a giant GPU to do serious computer vision. In this GDG Samsun De
 | Playground | Seven tasks, tracking, webcam, Solutions, auto annotation and the Platform API | `local_python/03` to `08` |
 | 2 Export | Export to ONNX, OpenVINO and TensorRT and race every format on every device | `local_python/02_export_model.py` |
 | 3 Ship | Run the model from the `ultralytics-inference` CLI and Rust crate | `local_inference/` |
+| Advanced | Export to INT8 and run every chip in your laptop at the same time | `yolo` and `ultralytics-inference` CLIs |
 
 The full guide with pictures lives on the **[workshop page](https://onuralpszr.github.io/gdg-samsun-etkinlik-2026-workshop/)**.
 
@@ -36,14 +37,17 @@ The full guide with pictures lives on the **[workshop page](https://onuralpszr.g
 | Time | Block | What happens |
 |---|---|---|
 | 00:00 | Warm up | Who has a GPU? Who has an NPU? Nobody gets left behind |
-| 00:05 | Step 0 | Prerequisites check and Ultralytics Platform login |
-| 00:12 | Step 1 | Hybrid training on your laptop plus a cloud training tour |
-| 00:25 | Playground | Seven tasks, tracking, Solutions and auto annotation |
-| 00:35 | Step 2 | Export and the great speed race |
-| 00:45 | Step 3 | Ultralytics Inference in Rust: CLI, batch, video and webcam |
+| 00:03 | Step 0 | Check the setup you installed at home and log in to the Ultralytics Platform |
+| 00:07 | Step 1 | Hybrid training on your laptop plus a cloud training tour |
+| 00:20 | Playground | Seven tasks, tracking, Solutions and auto annotation |
+| 00:30 | Step 2 | Export and the great speed race |
+| 00:38 | Step 3 | Ultralytics Inference in Rust: CLI, batch, video and webcam |
+| 00:48 | Advanced | INT8 export and every chip at once |
 | 00:55 | Wrap up | Live webcam showdown and questions |
 
 ## Step 0: Prerequisites check
+
+Install at home before the workshop. The PyTorch download is a few GB and `cargo install ultralytics-inference` builds from source, so at the workshop you only run the check.
 
 ```bash
 git clone https://github.com/onuralpszr/gdg-samsun-etkinlik-2026-workshop.git
@@ -222,6 +226,42 @@ cargo build --release --manifest-path local_inference/Cargo.toml --features "ope
 # DEVICE can be cpu, cuda:0, tensorrt:0, intel:cpu, intel:gpu or intel:npu
 DEVICE=intel:gpu local_inference/target/release/gdg-inference video yolo26n_openvino_model video.mp4
 ```
+
+## Advanced: INT8 and every chip at once
+
+INT8 export makes the model about a third of the size and keeps the mAP within a few points. `data` gives the calibration images.
+
+```bash
+# OpenVINO for Intel, TensorRT for NVIDIA, CoreML for Apple silicon
+yolo export model=yolo26n.pt format=openvino int8=True data=coco8.yaml
+yolo export model=yolo26n.pt format=engine int8=True data=coco8.yaml
+yolo export model=yolo26n.pt format=coreml int8=True
+
+# compare mAP50-95 and speed, full precision vs INT8
+yolo val model=yolo26n_openvino_model data=coco8.yaml device=intel:cpu
+yolo val model=yolo26n_int8_openvino_model data=coco8.yaml device=intel:cpu
+```
+
+Then give every chip its own job in its own terminal. Change the `device` values to match your machine.
+
+```bash
+# terminal 1: people on the webcam, device=0 on NVIDIA or intel:npu with the INT8 OpenVINO model
+yolo track model=yolo26n.pt source=0 device=0 show=True
+
+# terminal 2: poses in a video, device=cpu, mps or intel:gpu with an OpenVINO model
+yolo track model=yolo26n-pose.pt source=video.mp4 device=cpu show=True
+
+# terminal 3: Rust on the CPU
+ultralytics-inference predict --model yolo26n.onnx --source video.mp4 --show
+```
+
+Ideas to keep going after the workshop:
+
+- [ ] Label ten of your own photos with Smart Annotation, train on the Ultralytics Platform, export to INT8 and run the model in Rust.
+- [ ] Serve predictions from a small Rust web server built on the `ultralytics-inference` crate.
+- [ ] Read an RTSP camera, or several cameras at once, from the Rust app.
+- [ ] Put INT8 on the smallest computer you own, such as a Raspberry Pi or an old laptop.
+- [ ] Export a segment or pose model to INT8 and check how much accuracy it keeps.
 
 ## Build the docs locally
 

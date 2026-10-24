@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Step 3: High speed execution with the ultralytics-inference CLI
+# Step 3: High speed execution with the `ultralytics-inference` CLI
 #
 #   ./local_inference/run_cli.sh install     build the CLI with OpenVINO and video support
 #   ./local_inference/run_cli.sh image       single image
@@ -41,7 +41,7 @@ need_assets() {
 }
 
 install_cli() {
-  say "Installing ultralytics-inference with OpenVINO and video support"
+  say "Installing the Ultralytics Inference CLI with OpenVINO and video support"
   cargo install ultralytics-inference --features "openvino-native,video"
   "$CLI" --version
 }

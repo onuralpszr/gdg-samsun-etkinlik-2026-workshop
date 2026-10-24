@@ -1,4 +1,4 @@
-// No GPU Left Behind: fast Ultralytics YOLO inference with the ultralytics-inference Rust crate.
+// No GPU Left Behind: fast Ultralytics YOLO inference with the `ultralytics-inference` Rust crate.
 //
 // Four modes, one tiny binary:
 //   image  <model> <image>             single image, prints detections and saves an annotated copy
@@ -7,6 +7,7 @@
 //   bench  <model> <image> [runs]      median latency so you can compare with Python
 //
 // Pick the hardware with the DEVICE environment variable: cpu, intel:cpu, intel:gpu, intel:npu, cuda:0, coreml
+// Cap CPU threads with THREADS, for example THREADS=8 (0 or unset uses every core)
 
 use std::error::Error;
 use std::path::Path;
@@ -23,7 +24,8 @@ const USAGE: &str = "Usage:
   gdg-inference video <model> <video|webcam_index|rtsp_url>
   gdg-inference bench <model> <image> [runs]
 
-Set DEVICE to cpu, intel:gpu, intel:npu, cuda:0 or coreml (default: cpu)";
+Set DEVICE to cpu, intel:gpu, intel:npu, cuda:0 or coreml (default: cpu)
+Set THREADS to cap CPU threads (default: every core)";
 
 fn main() -> AnyResult<()> {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -52,9 +54,15 @@ fn load(model_path: &str) -> AnyResult<YOLOModel> {
     let device: Device = std::env::var("DEVICE")
         .unwrap_or_else(|_| "cpu".into())
         .parse()?;
+    // THREADS caps CPU threads, handy on hybrid laptops where the low power cores slow things down
+    let threads = std::env::var("THREADS")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(0);
     let config = InferenceConfig::new()
         .with_confidence(0.25)
-        .with_device(device);
+        .with_device(device)
+        .with_threads(threads);
     let mut model = YOLOModel::load_with_config(model_path, config)?;
     model.warmup()?;
     println!(

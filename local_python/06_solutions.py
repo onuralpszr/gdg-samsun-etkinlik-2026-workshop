@@ -7,7 +7,7 @@ speed     estimated speed of every moving object (traffic, sports)
 
 Usage:
     python local_python/06_solutions.py --solution count
-    python local_python/06_solutions.py --solution heatmap --device xpu
+    python local_python/06_solutions.py --solution heatmap --device intel:gpu --model yolo26n_openvino_model
     python local_python/06_solutions.py --solution blur --source 0
 """
 
@@ -17,6 +17,8 @@ from pathlib import Path
 import cv2
 from ultralytics import solutions
 from ultralytics.utils.downloads import safe_download
+
+from device_utils import DEVICE_HELP, pick_device
 
 VIDEO = "https://github.com/ultralytics/assets/releases/download/v0.0.0/solutions_ci_demo.mp4"
 
@@ -39,9 +41,10 @@ def main():
     parser.add_argument("--solution", default="count", choices=["count", "heatmap", "blur", "speed"])
     parser.add_argument("--model", default="yolo26n.pt", help="any Ultralytics YOLO model or export")
     parser.add_argument("--source", default=VIDEO, help="video path, URL or webcam index like 0")
-    parser.add_argument("--device", default="cpu", help="cpu, xpu, 0, intel:gpu or intel:npu")
+    parser.add_argument("--device", default="auto", help=DEVICE_HELP)
     parser.add_argument("--output", default=None, help="output video path, runs/solutions/<name>.mp4 by default")
     args = parser.parse_args()
+    args.device = pick_device(args.device, args.model)
 
     source = args.source
     if source.startswith("http"):

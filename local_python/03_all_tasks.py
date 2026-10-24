@@ -6,13 +6,15 @@ Swap the model name and you swap the superpower.
 Usage:
     python local_python/03_all_tasks.py                          # all seven tasks
     python local_python/03_all_tasks.py --tasks detect pose      # just a few
-    python local_python/03_all_tasks.py --device xpu --save-dir docs/assets/img
+    python local_python/03_all_tasks.py --save-dir docs/assets/img
 """
 
 import argparse
 from pathlib import Path
 
 from ultralytics import YOLO
+
+from device_utils import DEVICE_HELP, pick_device
 
 BUS = "https://ultralytics.com/images/bus.jpg"
 ZIDANE = "https://ultralytics.com/images/zidane.jpg"
@@ -32,7 +34,7 @@ TASKS = {
 def main():
     parser = argparse.ArgumentParser(description="Run every Ultralytics YOLO26 task on a sample image")
     parser.add_argument("--tasks", nargs="+", default=list(TASKS), choices=list(TASKS), help="tasks to run")
-    parser.add_argument("--device", default="cpu", help="cpu, xpu, mps or 0 for CUDA")
+    parser.add_argument("--device", default="auto", help=DEVICE_HELP)
     parser.add_argument("--save-dir", default="runs/tasks", help="folder for the annotated images")
     args = parser.parse_args()
 
@@ -41,7 +43,7 @@ def main():
     for task in args.tasks:
         weights, source = TASKS[task]
         model = YOLO(weights)
-        result = model.predict(source, device=args.device, verbose=False)[0]
+        result = model.predict(source, device=pick_device(args.device, weights), verbose=False)[0]
         out = save_dir / f"task_{task}.jpg"
         busy = task == "obb"  # aerial scenes hold hundreds of boats, so hide labels to keep it readable
         result.save(filename=str(out), labels=not busy, conf=not busy)

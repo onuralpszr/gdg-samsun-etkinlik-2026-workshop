@@ -3,7 +3,7 @@
 #
 #   ./setup_env.sh          Intel GPU and NPU laptops (PyTorch XPU plus OpenVINO)
 #   ./setup_env.sh cuda     NVIDIA GPU machines
-#   ./setup_env.sh cpu      Any machine, no accelerator needed
+#   ./setup_env.sh cpu      Apple silicon (MPS) and any other machine
 set -euo pipefail
 
 BACKEND="${1:-xpu}"

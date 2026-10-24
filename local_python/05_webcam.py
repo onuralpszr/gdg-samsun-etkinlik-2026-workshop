@@ -4,9 +4,9 @@ Point the camera at the audience, then switch between PyTorch and OpenVINO to fe
 Press q to quit.
 
 Usage:
-    python local_python/05_webcam.py                                            # PyTorch on CPU
+    python local_python/05_webcam.py                                            # best device on this machine
     python local_python/05_webcam.py --model yolo26n_openvino_model --device intel:gpu
-    python local_python/05_webcam.py --model yolo26n-pose.pt --device xpu --track
+    python local_python/05_webcam.py --model yolo26n-pose.pt --track
     python local_python/05_webcam.py --model yolo26n-seg.pt --camera 1
 """
 
@@ -16,17 +16,20 @@ import time
 import cv2
 from ultralytics import YOLO
 
+from device_utils import DEVICE_HELP, pick_device
+
 
 def main():
     parser = argparse.ArgumentParser(description="Live Ultralytics YOLO on your webcam")
     parser.add_argument("--model", default="yolo26n.pt", help="any Ultralytics YOLO model or export")
-    parser.add_argument("--device", default="cpu", help="cpu, xpu, 0, intel:cpu, intel:gpu or intel:npu")
+    parser.add_argument("--device", default="auto", help=DEVICE_HELP)
     parser.add_argument("--camera", type=int, default=0, help="webcam index")
     parser.add_argument("--track", action="store_true", help="add tracking IDs")
     parser.add_argument("--conf", type=float, default=0.4, help="confidence threshold")
     parser.add_argument("--max-frames", type=int, default=0, help="stop after this many frames, 0 runs forever")
     parser.add_argument("--no-show", action="store_true", help="run without a window, handy over SSH")
     args = parser.parse_args()
+    args.device = pick_device(args.device, args.model)
 
     model = YOLO(args.model)
     cap = cv2.VideoCapture(args.camera)

@@ -5,7 +5,7 @@ checkpoint so the whole room can watch your run in the browser. No API key? Trai
 
 Usage:
     export ULTRALYTICS_API_KEY=ul_xxx      # or run once: yolo login ul_xxx
-    python local_python/01_hybrid_train.py --model yolo26n.pt --data coco8.yaml --epochs 3 --device xpu --project gdg-samsun
+    python local_python/01_hybrid_train.py --model yolo26n.pt --data coco8.yaml --epochs 3 --project gdg-samsun
     python local_python/01_hybrid_train.py --data ul://your_username/datasets/your_dataset --project gdg-samsun
     python local_python/01_hybrid_train.py --local-only --device cpu
 """
@@ -17,6 +17,8 @@ import time
 from ultralytics import YOLO
 from ultralytics.utils import PLATFORM_URL, SETTINGS
 
+from device_utils import DEVICE_HELP, pick_device
+
 
 def parse_args():
     """Read command line flags."""
@@ -24,7 +26,7 @@ def parse_args():
     parser.add_argument("--model", default="yolo26n.pt", help="model weights or yaml, yolo26n.pt by default")
     parser.add_argument("--data", default="coco8.yaml", help="dataset yaml or ul://user/datasets/name Platform URI")
     parser.add_argument("--epochs", type=int, default=3, help="number of training epochs")
-    parser.add_argument("--device", default="auto", help="auto, cpu, xpu, mps, 0 or 0,1 for CUDA")
+    parser.add_argument("--device", default="auto", help=DEVICE_HELP)
     parser.add_argument("--project", default="gdg-samsun", help="Platform project name or user/project")
     parser.add_argument("--name", default="laptop-run", help="run name shown on the Platform")
     parser.add_argument("--imgsz", type=int, default=640, help="training image size")
@@ -32,21 +34,6 @@ def parse_args():
     parser.add_argument("--api-key", default=None, help="Ultralytics Platform API key, defaults to ULTRALYTICS_API_KEY")
     parser.add_argument("--local-only", action="store_true", help="skip the Platform and keep everything on disk")
     return parser.parse_args()
-
-
-def pick_device(device):
-    """Turn 'auto' into the best accelerator on this machine."""
-    if device != "auto":
-        return device
-    import torch
-
-    if torch.cuda.is_available():
-        return "0"
-    if hasattr(torch, "xpu") and torch.xpu.is_available():
-        return "xpu"
-    if torch.backends.mps.is_available():
-        return "mps"
-    return "cpu"
 
 
 def platform_login(api_key):

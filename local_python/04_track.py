@@ -17,6 +17,8 @@ from pathlib import Path
 from ultralytics import YOLO
 from ultralytics.utils.downloads import safe_download
 
+from device_utils import DEVICE_HELP, pick_device
+
 VIDEO = "https://github.com/ultralytics/assets/releases/download/v0.0.0/solutions_ci_demo.mp4"
 
 
@@ -26,10 +28,11 @@ def main():
     parser.add_argument("--source", default=VIDEO, help="video path, URL, RTSP stream or webcam index like 0")
     trackers = ["botsort", "bytetrack", "ocsort", "deepocsort", "fasttrack", "tracktrack"]
     parser.add_argument("--tracker", default="botsort", choices=trackers, help="tracking algorithm")
-    parser.add_argument("--device", default="cpu", help="cpu, xpu, 0, intel:gpu or intel:npu")
+    parser.add_argument("--device", default="auto", help=DEVICE_HELP)
     parser.add_argument("--classes", type=int, nargs="*", default=[0], help="class ids to track, 0 is person")
     parser.add_argument("--show", action="store_true", help="open a live window")
     args = parser.parse_args()
+    args.device = pick_device(args.device, args.model)
 
     source = args.source
     if source.startswith("http"):  # download first, a URL is read like a live stream and may drop frames

@@ -6,7 +6,7 @@ then review them in Ultralytics Platform (which also has Smart Annotation with S
 Usage:
     python local_python/07_auto_annotate.py                                 # sample images
     python local_python/07_auto_annotate.py --images path/to/your/images --classes 0 2
-    python local_python/07_auto_annotate.py --sam sam2.1_t.pt --device xpu
+    python local_python/07_auto_annotate.py --sam sam2.1_t.pt
 """
 
 import argparse
@@ -17,6 +17,8 @@ import numpy as np
 from ultralytics.data.annotator import auto_annotate
 from ultralytics.utils.downloads import safe_download
 from ultralytics.utils.plotting import colors
+
+from device_utils import DEVICE_HELP, pick_device
 
 SAMPLES = ["https://ultralytics.com/images/bus.jpg", "https://ultralytics.com/images/zidane.jpg"]
 
@@ -47,10 +49,11 @@ def main():
     parser.add_argument("--images", default="datasets/auto_annotate_demo/images", help="folder with images")
     parser.add_argument("--det", default="yolo26n.pt", help="Ultralytics YOLO detection model")
     parser.add_argument("--sam", default="sam2.1_b.pt", help="SAM model: sam2.1_t.pt, sam2.1_b.pt, mobile_sam.pt")
-    parser.add_argument("--device", default="cpu", help="cpu, xpu, mps or 0 for CUDA")
+    parser.add_argument("--device", default="auto", help=DEVICE_HELP)
     parser.add_argument("--classes", type=int, nargs="*", default=None, help="only label these class ids")
     parser.add_argument("--conf", type=float, default=0.25, help="detection confidence threshold")
     args = parser.parse_args()
+    args.device = pick_device(args.device, args.det)
 
     images = Path(args.images)
     if not images.exists():

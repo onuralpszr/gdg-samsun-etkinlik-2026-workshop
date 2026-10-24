@@ -1,70 +1,23 @@
-"""Multi object tracking with Ultralytics YOLO and six built in trackers.
+"""Track every person across frames with Ultralytics YOLO.
 
-Pick `botsort`, `bytetrack`, `ocsort`, `deepocsort`, `fasttrack` or `tracktrack` with --tracker.
-Every person gets a stable ID that follows them across frames. Works with any detect, segment, pose or obb model.
-
-Usage:
-    python local_python/04_track.py                                   # sample crowd video
-    python local_python/04_track.py --source 0 --show                 # your webcam
-    python local_python/04_track.py --model yolo26n-pose.pt --tracker bytetrack
-    python local_python/04_track.py --model yolo26n_openvino_model --device intel:gpu
+Other trackers from the CLI: yolo track model=yolo26n.pt source=video.mp4 tracker=bytetrack.yaml
+On your webcam: yolo track model=yolo26n.pt source=0 show=True
 """
-
-import argparse
-import time
-from pathlib import Path
 
 from ultralytics import YOLO
 from ultralytics.utils.downloads import safe_download
 
-from device_utils import DEVICE_HELP, pick_device
+from device_utils import DEVICE
 
 VIDEO = "https://github.com/ultralytics/assets/releases/download/v0.0.0/solutions_ci_demo.mp4"
 
+video = safe_download(VIDEO, dir="videos")
 
-def main():
-    parser = argparse.ArgumentParser(description="Track objects in a video, stream or webcam")
-    parser.add_argument("--model", default="yolo26n.pt", help="any Ultralytics YOLO model or export")
-    parser.add_argument("--source", default=VIDEO, help="video path, URL, RTSP stream or webcam index like 0")
-    trackers = ["botsort", "bytetrack", "ocsort", "deepocsort", "fasttrack", "tracktrack"]
-    parser.add_argument("--tracker", default="botsort", choices=trackers, help="tracking algorithm")
-    parser.add_argument("--device", default="auto", help=DEVICE_HELP)
-    parser.add_argument("--classes", type=int, nargs="*", default=[0], help="class ids to track, 0 is person")
-    parser.add_argument("--show", action="store_true", help="open a live window")
-    args = parser.parse_args()
-    args.device = pick_device(args.device, args.model)
-
-    source = args.source
-    if source.startswith("http"):  # download first, a URL is read like a live stream and may drop frames
-        source = Path("videos") / Path(source).name
-        if not source.exists():
-            safe_download(args.source, file=source)
-
-    model = YOLO(args.model)
-    stream = model.track(
-        source=str(source),
-        tracker=f"{args.tracker}.yaml",
-        device=args.device,
-        classes=args.classes,
-        stream=True,  # yields one frame at a time so memory stays flat on long videos
-        persist=True,
-        show=args.show,
-        save=True,
-        project="gdg-samsun",
-        name="track",
-        exist_ok=True,
-        verbose=False,
-    )
-
-    seen, frames, start = set(), 0, time.perf_counter()
-    for result in stream:
-        frames += 1
-        if result.boxes is not None and result.boxes.id is not None:
-            seen.update(result.boxes.id.int().tolist())
-    fps = frames / (time.perf_counter() - start)
-    print(f"Tracked {len(seen)} unique objects across {frames} frames at {fps:.1f} FPS with {args.tracker}")
-    print(f"Annotated video saved in {model.predictor.save_dir}")
-
-
-if __name__ == "__main__":
-    main()
+ids = set()
+model = YOLO("yolo26n.pt")
+for result in model.track(
+    video, tracker="botsort.yaml", classes=[0], device=DEVICE, stream=True, save=True, verbose=False
+):
+    if result.boxes.id is not None:
+        ids.update(result.boxes.id.int().tolist())
+print(f"Tracked {len(ids)} people, the annotated video is in {result.save_dir}")

@@ -61,7 +61,7 @@ batch() {
 }
 
 video() {
-  say "Video file, one frame in memory at a time, saving frames off for minimal overhead"
+  say "Video file, one frame in memory at a time, with saving turned off for minimal overhead"
   "$CLI" predict --model yolo26n_openvino_model --device intel:gpu --source videos/solutions_ci_demo.mp4 --save false --verbose false
   say "Same video with the annotated MP4 saved under runs/detect/predict"
   "$CLI" predict --model yolo26n_openvino_model --device intel:gpu --source videos/solutions_ci_demo.mp4

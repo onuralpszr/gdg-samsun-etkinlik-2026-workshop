@@ -91,6 +91,7 @@ flowchart TB
         I --> M[Rust crate app]
         J --> M
         K --> N[Python on NVIDIA]
+        I --> P[TensorRT FP16 in Rust on NVIDIA]
         J --> O[Intel CPU, GPU and NPU]
     end
 ```
@@ -367,7 +368,7 @@ Intel Core Ultra X7 358H with Arc B390 graphics and the built in NPU, `yolo26n.p
 
 !!! info "Got an NVIDIA GPU?"
 
-    Add `--tensorrt` and the race gets a TensorRT FP16 row. On Colab pick the T4 runtime and the notebook does it for you.
+    Add `--tensorrt` and the race gets a TensorRT FP16 row. On Colab pick the T4 runtime and the notebook does it for you. Rust can run TensorRT FP16 straight from the ONNX file too, see Step 3.4.
 
 ## Step 3: High speed execution with Ultralytics Inference :crab:
 
@@ -481,6 +482,27 @@ ultralytics-inference predict --task segment --source bus.jpg         # one task
 <figcaption>obb, every ship and harbor in the port</figcaption>
 </figure>
 </div>
+
+### 3.4 NVIDIA TensorRT FP16 straight from ONNX
+
+You do not need the `.engine` file from Step 2 to use TensorRT in Rust. Ultralytics Inference hands the ONNX model to the ONNX Runtime TensorRT execution provider, which builds an FP16 engine on the first run and caches it in `.trt_cache/` next to the model. The first load takes about a minute, and every load after that starts in seconds.
+
+```bash
+cargo install ultralytics-inference --features "nvidia,video"
+ultralytics-inference predict --model yolo26n.onnx --source bus.jpg --device tensorrt:0 --quantize 16
+
+cargo build --release --manifest-path local_inference/Cargo.toml --features "nvidia,video"
+DEVICE=tensorrt:0 local_inference/target/release/gdg-inference bench yolo26n.onnx bus.jpg 300   # FP16 by default
+```
+
+```rust
+let config = InferenceConfig::new().with_device(Device::TensorRt(0)).with_quantize(Quantization::Fp16);
+let mut model = YOLOModel::load_with_config("yolo26n.onnx", config)?;
+```
+
+!!! info "What TensorRT needs"
+
+    An NVIDIA driver plus the CUDA 13 runtime, cuDNN 9 and TensorRT 10 on the library path. The prebuilt ONNX Runtime is built for CUDA 13 only. Pass `--rect false` to the CLI so every frame has the same shape and only one engine gets built. Want plain CUDA without TensorRT? Use `--device cuda:0`.
 
 ### Results: Python vs Rust
 

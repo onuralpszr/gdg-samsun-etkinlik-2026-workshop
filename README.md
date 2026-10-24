@@ -73,6 +73,7 @@ flowchart TB
         I --> M[Rust crate app]
         J --> M
         K --> N[Python on NVIDIA]
+        I --> P[TensorRT FP16 in Rust on NVIDIA]
         J --> O[Intel CPU, GPU and NPU]
     end
 ```
@@ -201,6 +202,7 @@ ultralytics-inference predict --model yolo26n.onnx --source bus.jpg             
 ultralytics-inference predict --model yolo26n.onnx --source images/ --batch 4                # batch
 ultralytics-inference predict --model yolo26n_openvino_model --device intel:gpu --source video.mp4
 ultralytics-inference predict --model yolo26n_openvino_model --device intel:npu --source 0 --show
+ultralytics-inference predict --model yolo26n.onnx --device tensorrt:0 --quantize 16 --source bus.jpg   # NVIDIA TensorRT FP16 from ONNX, build with --features nvidia
 
 ./local_inference/run_cli.sh all                                                              # the whole tour
 ```

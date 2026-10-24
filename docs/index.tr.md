@@ -91,6 +91,7 @@ flowchart TB
         I --> M[Rust uygulaması]
         J --> M
         K --> N[NVIDIA üzerinde Python]
+        I --> P[NVIDIA üzerinde Rust ile TensorRT FP16]
         J --> O[Intel CPU, GPU ve NPU]
     end
 ```
@@ -367,7 +368,7 @@ YOLO("yolo26n_openvino_model").predict("bus.jpg", device="intel:npu")  # evet, N
 
 !!! info "NVIDIA GPU'nuz varsa"
 
-    `--tensorrt` parametresini eklediğinizde tabloya bir TensorRT FP16 satırı da eklenir. Colab'da T4 çalışma ortamını seçerseniz notebook bu adımı sizin için yapar.
+    `--tensorrt` parametresini eklediğinizde tabloya bir TensorRT FP16 satırı da eklenir. Colab'da T4 çalışma ortamını seçerseniz notebook bu adımı sizin için yapar. Rust da ONNX dosyasından doğrudan TensorRT FP16 çalıştırabilir, ayrıntılar Adım 3.4'te.
 
 ## Adım 3: Ultralytics Inference ile yüksek hızda çalıştırma :crab:
 
@@ -481,6 +482,27 @@ ultralytics-inference predict --task segment --source bus.jpg         # tek bir 
 <figcaption>obb, limandaki tüm gemiler ve rıhtımlar tek tek bulunuyor</figcaption>
 </figure>
 </div>
+
+### 3.4 ONNX üzerinden doğrudan NVIDIA TensorRT FP16
+
+Rust tarafında TensorRT kullanmak için Adım 2'deki `.engine` dosyasına ihtiyacınız yok. Ultralytics Inference, ONNX modelini ONNX Runtime TensorRT execution provider katmanına verir. Bu katman ilk çalıştırmada bir FP16 motoru derler ve modelin yanındaki `.trt_cache/` klasörüne kaydeder. İlk yükleme yaklaşık bir dakika sürer, sonraki yüklemeler ise saniyeler içinde açılır.
+
+```bash
+cargo install ultralytics-inference --features "nvidia,video"
+ultralytics-inference predict --model yolo26n.onnx --source bus.jpg --device tensorrt:0 --quantize 16
+
+cargo build --release --manifest-path local_inference/Cargo.toml --features "nvidia,video"
+DEVICE=tensorrt:0 local_inference/target/release/gdg-inference bench yolo26n.onnx bus.jpg 300   # varsayılan olarak FP16
+```
+
+```rust
+let config = InferenceConfig::new().with_device(Device::TensorRt(0)).with_quantize(Quantization::Fp16);
+let mut model = YOLOModel::load_with_config("yolo26n.onnx", config)?;
+```
+
+!!! info "TensorRT için gerekenler"
+
+    Bir NVIDIA sürücüsünün yanında CUDA 13 runtime, cuDNN 9 ve TensorRT 10 kütüphanelerinin de kütüphane yolunda bulunması gerekir. Hazır ONNX Runtime yalnızca CUDA 13 için derlenmiştir. CLI'a `--rect false` verirseniz her kare aynı boyutta olur ve yalnızca tek bir motor derlenir. TensorRT olmadan sadece CUDA kullanmak isterseniz `--device cuda:0` yazmanız yeterlidir.
 
 ### Sonuçlar: Python ve Rust karşılaştırması
 

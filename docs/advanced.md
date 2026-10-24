@@ -1,5 +1,7 @@
 ---
 title: "Advanced: INT8 and every chip at once"
+hide:
+  - navigation
 ---
 
 # Advanced: INT8 and every chip at once :rocket:

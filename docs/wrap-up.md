@@ -1,5 +1,7 @@
 ---
 title: "Wrap up"
+hide:
+  - navigation
 ---
 
 # Wrap up :tada:

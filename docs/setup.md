@@ -1,5 +1,7 @@
 ---
 title: "Step 0: Prerequisites check"
+hide:
+  - navigation
 ---
 
 # Step 0: Prerequisites check :white_check_mark:

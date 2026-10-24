@@ -1,5 +1,7 @@
 ---
 title: "Step 3: High speed execution with Ultralytics Inference"
+hide:
+  - navigation
 ---
 
 # Step 3: High speed execution with Ultralytics Inference :crab:

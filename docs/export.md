@@ -1,5 +1,7 @@
 ---
 title: "Step 2: Export and the great speed race"
+hide:
+  - navigation
 ---
 
 # Step 2: Export and the great speed race :package:

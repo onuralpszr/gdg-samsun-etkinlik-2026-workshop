@@ -1,5 +1,7 @@
 ---
 title: "Playground: everything Ultralytics YOLO can do"
+hide:
+  - navigation
 ---
 
 # Playground: everything Ultralytics YOLO can do :art:

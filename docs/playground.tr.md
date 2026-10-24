@@ -1,5 +1,7 @@
 ---
 title: "Deneme alanı: Ultralytics YOLO ile neler yapılabilir"
+hide:
+  - navigation
 ---
 
 # Deneme alanı: Ultralytics YOLO ile neler yapılabilir :art:

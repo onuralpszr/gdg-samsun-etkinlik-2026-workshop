@@ -1,5 +1,7 @@
 ---
 title: "Adım 1: Ultralytics Platform ve hibrit eğitim"
+hide:
+  - navigation
 ---
 
 # Adım 1: Ultralytics Platform ve hibrit eğitim :weight_lifter:

@@ -1,5 +1,7 @@
 ---
 title: "Adım 3: Ultralytics Inference ile yüksek hızda çalıştırma"
+hide:
+  - navigation
 ---
 
 # Adım 3: Ultralytics Inference ile yüksek hızda çalıştırma :crab:

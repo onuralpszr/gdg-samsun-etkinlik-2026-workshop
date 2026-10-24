@@ -1,5 +1,7 @@
 ---
 title: "İleri seviye: INT8 ve bütün çipler aynı anda"
+hide:
+  - navigation
 ---
 
 # İleri seviye: INT8 ve bütün çipler aynı anda :rocket:

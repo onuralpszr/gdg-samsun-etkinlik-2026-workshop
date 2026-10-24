@@ -1,5 +1,7 @@
 ---
 title: "Adım 2: Dışa aktarma ve büyük hız yarışı"
+hide:
+  - navigation
 ---
 
 # Adım 2: Dışa aktarma ve büyük hız yarışı :package:

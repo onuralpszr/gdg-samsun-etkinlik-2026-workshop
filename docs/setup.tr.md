@@ -1,5 +1,7 @@
 ---
 title: "Adım 0: Ön koşul kontrolü"
+hide:
+  - navigation
 ---
 
 # Adım 0: Ön koşul kontrolü :white_check_mark:

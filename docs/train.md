@@ -1,5 +1,7 @@
 ---
 title: "Step 1: Ultralytics Platform and hybrid training"
+hide:
+  - navigation
 ---
 
 # Step 1: Ultralytics Platform and hybrid training :weight_lifter:

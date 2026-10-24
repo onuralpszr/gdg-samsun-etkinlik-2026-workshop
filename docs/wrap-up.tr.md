@@ -1,5 +1,7 @@
 ---
 title: "Kapanış"
+hide:
+  - navigation
 ---
 
 # Kapanış :tada:

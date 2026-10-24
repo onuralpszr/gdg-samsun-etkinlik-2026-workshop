@@ -102,10 +102,23 @@
 
 /* Colored step cards */
 .steps {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 1rem;
   margin: 1rem 0 2rem;
+}
+
+/* Four cards per row, the last row stays centered */
+.steps .card {
+  flex: 0 1 calc((100% - 3rem) / 4);
+  min-width: 220px;
+}
+
+@media screen and (max-width: 600px) {
+  .steps .card {
+    flex-basis: 100%;
+  }
 }
 
 .steps .card {
@@ -247,9 +260,4 @@
   display: flex;
   justify-content: center;
   margin: 0;
-}
-
-/* A lone last card fills its row */
-.steps .card:last-child:nth-child(3n + 1) {
-  grid-column: 1 / -1;
 }

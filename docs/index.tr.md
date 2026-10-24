@@ -3,6 +3,7 @@ title: Hiçbir GPU Geride Kalmasın
 description: Hibrit Ultralytics YOLO eğitimi ve hızlı çalıştırma üzerine GDG Samsun DevFest 2026 uygulamalı atölyesi
 hide:
   - navigation
+  - toc
 ---
 
 <div class="hero" markdown>

@@ -3,6 +3,7 @@ title: No GPU Left Behind
 description: Hybrid Ultralytics YOLO training and fast execution, a hands on GDG Samsun DevFest 2026 workshop
 hide:
   - navigation
+  - toc
 ---
 
 <div class="hero" markdown>

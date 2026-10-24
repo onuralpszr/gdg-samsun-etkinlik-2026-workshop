@@ -1,0 +1,9 @@
+# Workshop Python packages
+# Install PyTorch first with setup_env.sh so you get the right build for your hardware (XPU, CUDA or CPU)
+ultralytics>=8.4.120
+openvino>=2026.0
+onnx>=1.18
+onnxruntime>=1.22
+onnxslim>=0.1.71
+lap>=0.5.12
+jupyter

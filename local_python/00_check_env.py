@@ -52,7 +52,11 @@ def main():
         check("ONNX Runtime", False, "pip install onnxruntime")
 
     check("Rust cargo", shutil.which("cargo") is not None, "needed for Step 3")
-    check("ultralytics-inference CLI", shutil.which("ultralytics-inference") is not None, "cargo install ultralytics-inference")
+    check(
+        "ultralytics-inference CLI",
+        shutil.which("ultralytics-inference") is not None,
+        "cargo install ultralytics-inference",
+    )
 
     from ultralytics.utils import SETTINGS
 

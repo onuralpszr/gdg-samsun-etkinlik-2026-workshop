@@ -68,7 +68,9 @@ def platform_login(api_key):
 
     os.environ["ULTRALYTICS_API_KEY"] = api_key  # the Platform callback reads this during training
     credits = account.get("creditsCents", 0) / 100
-    print(f"Logged in to Ultralytics Platform as {account['username']} ({account['plan']} plan, ${credits:.2f} credits)")
+    print(
+        f"Logged in to Ultralytics Platform as {account['username']} ({account['plan']} plan, ${credits:.2f} credits)"
+    )
     return account["username"]
 
 

@@ -15,7 +15,6 @@ import statistics
 from pathlib import Path
 
 import torch
-
 from ultralytics import YOLO
 from ultralytics.utils import ASSETS
 

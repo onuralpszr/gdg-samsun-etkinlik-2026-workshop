@@ -11,8 +11,10 @@ Usage:
 
 import argparse
 import time
+from pathlib import Path
 
 from ultralytics import YOLO
+from ultralytics.utils.downloads import safe_download
 
 VIDEO = "https://github.com/ultralytics/assets/releases/download/v0.0.0/solutions_ci_demo.mp4"
 
@@ -27,9 +29,15 @@ def main():
     parser.add_argument("--show", action="store_true", help="open a live window")
     args = parser.parse_args()
 
+    source = args.source
+    if source.startswith("http"):  # download first, a URL is read like a live stream and may drop frames
+        source = Path("videos") / Path(source).name
+        if not source.exists():
+            safe_download(args.source, file=source)
+
     model = YOLO(args.model)
     stream = model.track(
-        source=args.source,
+        source=str(source),
         tracker=f"{args.tracker}.yaml",
         device=args.device,
         classes=args.classes,

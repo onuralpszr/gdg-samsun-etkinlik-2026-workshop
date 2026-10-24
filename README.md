@@ -223,6 +223,7 @@ The Rust binary is 37 MB with no Python at runtime. It runs video 1.4x faster wi
 | `local_inference/run_cli.sh` | `ultralytics-inference` CLI tour |
 | `notebooks/hybrid_yolo_workshop.ipynb` | The whole workshop in Google Colab |
 | `docs/` | GitHub Pages site built with MkDocs Material |
+| `tools/` | Notebook generator and prose style checker |
 | `.github/workflows/pages.yml` | Deploys the docs on every push to `main` |
 
 ## Build the docs locally

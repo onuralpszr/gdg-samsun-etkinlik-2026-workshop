@@ -517,6 +517,7 @@ Video throughput and memory on a 620 frame crowd clip:
 | `local_python/08_platform_tour.py` | Ultralytics Platform Python client tour |
 | `local_inference/` | Rust Cargo project plus `run_cli.sh` for `ultralytics-inference` |
 | `notebooks/hybrid_yolo_workshop.ipynb` | The whole workshop in Google Colab |
+| `tools/` | Notebook generator and prose style checker |
 
 ## Stay in touch :handshake:
 

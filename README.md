@@ -183,6 +183,22 @@ ultralytics-inference predict --model yolo26n_openvino_model --device intel:npu 
 ./local_inference/run_cli.sh all                                                              # the whole tour
 ```
 
+All seven tasks work in Rust too. `./local_inference/run_cli.sh tasks` runs each one and saves the results under `runs/<task>/`:
+
+<table>
+<tr>
+<td><img src="docs/assets/img/rust_detect.jpg" alt="Rust detect"><br><b>detect</b></td>
+<td><img src="docs/assets/img/rust_segment.jpg" alt="Rust segment"><br><b>segment</b></td>
+<td><img src="docs/assets/img/rust_semantic.jpg" alt="Rust semantic"><br><b>semantic</b></td>
+<td><img src="docs/assets/img/rust_depth.jpg" alt="Rust depth"><br><b>depth</b></td>
+</tr>
+<tr>
+<td><img src="docs/assets/img/rust_classify.jpg" alt="Rust classify"><br><b>classify</b></td>
+<td><img src="docs/assets/img/rust_pose.jpg" alt="Rust pose"><br><b>pose</b></td>
+<td colspan="2"><img src="docs/assets/img/rust_obb.jpg" alt="Rust obb"><br><b>obb</b></td>
+</tr>
+</table>
+
 The Cargo project in `local_inference/` uses the crate directly with image, batch, video and bench modes:
 
 ```bash

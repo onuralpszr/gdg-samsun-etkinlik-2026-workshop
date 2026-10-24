@@ -437,10 +437,43 @@ DEVICE=intel:gpu $BIN video yolo26n_openvino_model video.mp4           # video, 
 DEVICE=intel:npu $BIN bench yolo26n_openvino_model bus.jpg 300         # latency
 ```
 
+### 3.3 All seven tasks in Rust
+
+Pass `--task` and the CLI downloads the matching YOLO26 nano model, runs it on the sample images and saves the annotated results under `runs/<task>/`. Every picture below was drawn by the Rust CLI on the workshop laptop, with no Python involved.
+
+```bash
+./local_inference/run_cli.sh tasks                                    # all seven tasks in one go
+ultralytics-inference predict --task segment --source bus.jpg         # one task on your own image
+```
+
 <div class="gallery" markdown>
 <figure markdown>
-![Rust annotated output](assets/img/rust_bus.jpg)
-<figcaption>Annotated by the Rust binary, same boxes as Python</figcaption>
+![Rust detect](assets/img/rust_detect.jpg)
+<figcaption>detect, the same boxes as Python</figcaption>
+</figure>
+<figure markdown>
+![Rust segment](assets/img/rust_segment.jpg)
+<figcaption>segment</figcaption>
+</figure>
+<figure markdown>
+![Rust semantic](assets/img/rust_semantic.jpg)
+<figcaption>semantic</figcaption>
+</figure>
+<figure markdown>
+![Rust depth](assets/img/rust_depth.jpg)
+<figcaption>depth</figcaption>
+</figure>
+<figure markdown>
+![Rust classify](assets/img/rust_classify.jpg)
+<figcaption>classify (minibus 0.53)</figcaption>
+</figure>
+<figure markdown>
+![Rust pose](assets/img/rust_pose.jpg)
+<figcaption>pose</figcaption>
+</figure>
+<figure markdown>
+![Rust obb](assets/img/rust_obb.jpg)
+<figcaption>obb, every ship and harbor in the port</figcaption>
 </figure>
 </div>
 

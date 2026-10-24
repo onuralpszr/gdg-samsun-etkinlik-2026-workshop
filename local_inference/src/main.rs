@@ -6,15 +6,18 @@
 //   video  <model> <source>            video file, webcam index or RTSP stream, one frame in memory at a time
 //   bench  <model> <image> [runs]      median latency so you can compare with Python
 //
-// Pick the hardware with the DEVICE environment variable: cpu, intel:cpu, intel:gpu, intel:npu, cuda:0, coreml
+// Pick the hardware with the DEVICE environment variable: cpu, intel:cpu, intel:gpu, intel:npu, cuda:0, tensorrt:0, coreml
 // Cap CPU threads with THREADS, for example THREADS=8 (0 or unset uses every core)
+// Pick the precision with QUANTIZE, for example QUANTIZE=16 (TensorRT uses FP16 unless you say otherwise)
 
 use std::error::Error;
 use std::path::Path;
 use std::time::Instant;
 
 use image::DynamicImage;
-use ultralytics_inference::{Device, InferenceConfig, Results, Source, SourceIterator, YOLOModel};
+use ultralytics_inference::{
+    Device, InferenceConfig, Quantization, Results, Source, SourceIterator, YOLOModel,
+};
 
 type AnyResult<T> = Result<T, Box<dyn Error>>;
 
@@ -24,8 +27,9 @@ const USAGE: &str = "Usage:
   gdg-inference video <model> <video|webcam_index|rtsp_url>
   gdg-inference bench <model> <image> [runs]
 
-Set DEVICE to cpu, intel:gpu, intel:npu, cuda:0 or coreml (default: cpu)
-Set THREADS to cap CPU threads (default: every core)";
+Set DEVICE to cpu, intel:gpu, intel:npu, cuda:0, tensorrt:0 or coreml (default: cpu)
+Set THREADS to cap CPU threads (default: every core)
+Set QUANTIZE to 16 or 32 to pick the precision (default: 16 on TensorRT, model precision elsewhere)";
 
 fn main() -> AnyResult<()> {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -59,10 +63,18 @@ fn load(model_path: &str) -> AnyResult<YOLOModel> {
         .ok()
         .and_then(|v| v.parse().ok())
         .unwrap_or(0);
-    let config = InferenceConfig::new()
+    // TensorRT builds an FP16 engine from the ONNX file, the first run takes a minute and is cached in .trt_cache
+    let quantize: Option<Quantization> = match std::env::var("QUANTIZE") {
+        Ok(value) => Some(value.parse()?),
+        Err(_) => matches!(device, Device::TensorRt(_)).then_some(Quantization::Fp16),
+    };
+    let mut config = InferenceConfig::new()
         .with_confidence(0.25)
         .with_device(device)
         .with_threads(threads);
+    if let Some(quantize) = quantize {
+        config = config.with_quantize(quantize);
+    }
     let mut model = YOLOModel::load_with_config(model_path, config)?;
     model.warmup()?;
     println!(

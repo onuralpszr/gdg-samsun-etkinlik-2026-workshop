@@ -1,0 +1,27 @@
+[package]
+name = "gdg-inference"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.92"
+license = "AGPL-3.0"
+description = "No GPU Left Behind workshop: fast Ultralytics YOLO inference in Rust with Ultralytics Inference"
+publish = false
+
+[dependencies]
+ultralytics-inference = "0.0.54"
+# Same image crate version the inference crate uses, only needed to name the DynamicImage type
+image = { version = "0.25", default-features = false }
+
+[features]
+default = []
+# Run OpenVINO IR exports natively on Intel CPU, GPU and NPU (needs the OpenVINO runtime, pip install openvino works)
+openvino = ["ultralytics-inference/openvino-native"]
+# Decode video files, webcams and RTSP streams with FFmpeg (needs FFmpeg development libraries)
+video = ["ultralytics-inference/video"]
+# NVIDIA CUDA and TensorRT execution providers
+nvidia = ["ultralytics-inference/cuda", "ultralytics-inference/tensorrt"]
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true

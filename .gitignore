@@ -24,3 +24,9 @@ site/
 .env
 .yolo_config/
 weights/
+videos/
+
+# Sample media downloaded by the demos
+/*.jpg
+/*.mov
+/*.mp4

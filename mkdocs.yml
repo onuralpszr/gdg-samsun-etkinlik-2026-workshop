@@ -34,6 +34,7 @@ theme:
     - content.code.copy
     - content.code.annotate
     - content.tabs.link
+    - navigation.tabs
     - navigation.top
     - navigation.footer
     - search.highlight
@@ -55,7 +56,13 @@ plugins:
           site_description: Hibrit Ultralytics YOLO eğitimi ve hızlı çalıştırma, GDG Samsun DevFest 2026 atölyesi
           copyright: GDG Samsun DevFest 2026 atölyesi, Onuralp Sezer, kod AGPL 3.0 lisanslı
           nav_translations:
-            Workshop: Atölye
+            Home: Ana sayfa
+            Step 0 Setup: Adım 0 Kurulum
+            Step 1 Train: Adım 1 Eğitim
+            Playground: Deneme alanı
+            Step 2 Export: Adım 2 Dışa aktarma
+            Step 3 Rust: Adım 3 Rust
+            Wrap up: Kapanış
 
 extra_css:
   - stylesheets/gdg.css
@@ -95,4 +102,14 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
 
 nav:
-  - Workshop: index.md
+  - Home: index.md
+  - Step 0 Setup: setup.md
+  - Step 1 Train: train.md
+  - Playground: playground.md
+  - Step 2 Export: export.md
+  - Step 3 Rust: rust.md
+  - Wrap up: wrap-up.md
+
+validation:
+  links:
+    anchors: warn

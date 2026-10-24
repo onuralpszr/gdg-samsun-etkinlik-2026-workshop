@@ -103,7 +103,7 @@
 /* Colored step cards */
 .steps {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1rem;
   margin: 1rem 0 2rem;
 }
@@ -198,4 +198,46 @@
   .hero h1 {
     font-size: 1.9rem;
   }
+}
+
+/* Step by step navigation: black tab bar, clickable cards and a next step button */
+.md-tabs {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.md-tabs__link--active,
+.md-tabs__item--active .md-tabs__link {
+  color: var(--gdg-yellow);
+}
+
+.steps .card {
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.steps .card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.steps .card strong a {
+  color: inherit;
+}
+
+.steps .card strong a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.steps .card:nth-child(4n + 1) { border-top-color: var(--gdg-blue); }
+.steps .card:nth-child(4n + 2) { border-top-color: var(--gdg-red); }
+.steps .card:nth-child(4n + 3) { border-top-color: var(--gdg-yellow); }
+.steps .card:nth-child(4n + 4) { border-top-color: var(--gdg-green); }
+
+.md-typeset .next-step {
+  display: table;
+  margin: 2.5rem 0 0 auto;
+  border-radius: 999px;
 }
